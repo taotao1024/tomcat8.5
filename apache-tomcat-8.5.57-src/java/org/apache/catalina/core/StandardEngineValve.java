@@ -50,7 +50,7 @@ final class StandardEngineValve extends ValveBase {
      * The string manager for this package.
      */
     private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+            StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
@@ -60,30 +60,33 @@ final class StandardEngineValve extends ValveBase {
      * based on the requested server name.  If no matching Host can
      * be found, return an appropriate HTTP error.
      *
-     * @param request Request to be processed
+     * @param request  Request to be processed
      * @param response Response to be produced
-     *
-     * @exception IOException if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
+     * @throws IOException      if an input/output error occurred
+     * @throws ServletException if a servlet error occurred
      */
     @Override
     public final void invoke(Request request, Response response)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
-        // Select the Host to be used for this Request
+        // 选择用于此请求的主机
         Host host = request.getHost();
         if (host == null) {
             response.sendError
-                (HttpServletResponse.SC_BAD_REQUEST,
-                 sm.getString("standardEngine.noHost",
-                              request.getServerName()));
+                    (HttpServletResponse.SC_BAD_REQUEST,
+                            sm.getString("standardEngine.noHost",
+                                    request.getServerName()));
             return;
         }
+        // 异步处理
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(host.getPipeline().isAsyncSupported());
         }
 
-        // Ask this Host to process this request
+        // 请求此主机处理此请求
+        // StandardHost.getPipeline()-->StandardPipeline.getFirst()-->Valve.invoke(request, response);
+        // Engine-->Host-->Context-->Wrapper
+        // StandardWrapperValve.invoke() 最终的处理
         host.getPipeline().getFirst().invoke(request, response);
 
     }

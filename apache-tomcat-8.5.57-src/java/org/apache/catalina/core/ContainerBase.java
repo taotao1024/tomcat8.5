@@ -902,14 +902,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Start our subordinate components, if any
+        // 启动我们的子组件(如果有的话)
         logger = null;
         getLogger();
+
+        // 启动集群
         Cluster cluster = getClusterInternal();
         if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).start();
         }
-        // 启动集群
+        // 启动域
         Realm realm = getRealmInternal();
         if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).start();
@@ -917,9 +919,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         /**
          * 启动子容器<P>
+         * 层级调用<P>
+         * engine --> host --> context --> wrapper <P>
          * Future同步框架 实现同步启动<P>
          */
-        Container children[] = findChildren();
+        Container[] children = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
             results.add(startStopExecutor.submit(new StartChild(child)));
@@ -956,7 +960,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) pipeline).start();
         }
 
-        // 设置生命周期状态
+        /**
+         * 设置生命周期状态 -->  HostConfig.start() <P>
+         * 状态的变化会触发监听器
+         */
         setState(LifecycleState.STARTING);
 
         // 启动线程

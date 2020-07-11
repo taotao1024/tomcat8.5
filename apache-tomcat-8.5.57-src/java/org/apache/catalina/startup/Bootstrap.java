@@ -333,6 +333,7 @@ public final class Bootstrap {
             log.debug("Calling startup class " + method);
         }
         method.invoke(catalinaDaemon, param);
+        System.out.println("====================  初始化成功 ==================== ");
     }
 
 
@@ -530,7 +531,7 @@ public final class Bootstrap {
                  * 加载守护线程,反射执行Catalina的Load()方法
                  *
                  * BootStrap.init()-->Catalina.load()-->StandardServer.init()-->
-                 * StandardService.initInternal()-->engine.init()容器
+                 * StandardService.initInternal()-->engine.init()容器-->StandardEngine.initInternal()
                  * StandardService.initInternal()-->executor.init()线程池
                  * StandardService.initInternal()-->connector.init()连接器 -->ProtocolHandler.init()-->EndPoint
                  */

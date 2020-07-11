@@ -80,8 +80,10 @@ public class Connector extends LifecycleMBeanBase {
     public Connector(String protocol) {
         setProtocol(protocol);
         // Instantiate protocol handler
+        // 实例化协议处理器
         ProtocolHandler p = null;
         try {
+            // 反射 实例化 HTTP/1.1
             Class<?> clazz = Class.forName(protocolHandlerClassName);
             p = (ProtocolHandler) clazz.getConstructor().newInstance();
         } catch (Exception e) {
@@ -242,8 +244,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Coyote Protocol handler class name.
-     * Defaults to the Coyote HTTP/1.1 protocolHandler.
+     * Coyote协议处理程序类名<p>
+     * 默认加载Coyote HTTP/1.1协议处理程序。
      */
     protected String protocolHandlerClassName =
             "org.apache.coyote.http11.Http11NioProtocol";
@@ -279,6 +281,8 @@ public class Connector extends LifecycleMBeanBase {
 
     /**
      * The URI encoding in use.
+     * <p>
+     * 默认是UTF-8
      */
     private Charset uriCharset = StandardCharsets.UTF_8;
 

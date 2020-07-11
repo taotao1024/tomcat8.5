@@ -16,22 +16,27 @@
  */
 package javax.websocket;
 
+/**
+ * Endpoint节点监听器
+ */
 public abstract class Endpoint {
 
     /**
      * Event that is triggered when a new session starts.
+     * 当新会话启动时触发的事件。
      *
-     * @param session   The new session.
-     * @param config    The configuration with which the Endpoint was
-     *                  configured.
+     * @param session 新的会话
+     * @param config  The configuration with which the Endpoint was
+     *                configured.
      */
     public abstract void onOpen(Session session, EndpointConfig config);
 
     /**
      * Event that is triggered when a session has closed.
+     * 当会话关闭时触发的事件。
      *
-     * @param session       The session
-     * @param closeReason   Why the session was closed
+     * @param session     当前会话
+     * @param closeReason 会议为什么关闭
      */
     public void onClose(Session session, CloseReason closeReason) {
         // NO-OP by default
@@ -39,9 +44,10 @@ public abstract class Endpoint {
 
     /**
      * Event that is triggered when a protocol error occurs.
+     * 当发生协议错误时触发的事件。
      *
-     * @param session   The session.
-     * @param throwable The exception.
+     * @param session   当前会话
+     * @param throwable 异常
      */
     public void onError(Session session, Throwable throwable) {
         // NO-OP by default

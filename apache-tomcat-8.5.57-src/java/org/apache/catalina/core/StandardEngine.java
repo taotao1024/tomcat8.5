@@ -68,7 +68,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         /* Set the jmvRoute using the system property jvmRoute */
         try {
             setJvmRoute(System.getProperty("jvmRoute"));
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             log.warn(sm.getString("standardEngine.jvmRouteFail"));
         }
         // By default, the engine will hold the reloading thread
@@ -103,7 +103,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * the intended host and context.
      */
     private final AtomicReference<AccessLog> defaultAccessLog =
-        new AtomicReference<>();
+            new AtomicReference<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -150,7 +150,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             this.defaultHost = host.toLowerCase(Locale.ENGLISH);
         }
         support.firePropertyChange("defaultHost", oldDefaultHost,
-                                   this.defaultHost);
+                this.defaultHost);
 
     }
 
@@ -210,7 +210,7 @@ public class StandardEngine extends ContainerBase implements Engine {
 
         if (!(child instanceof Host))
             throw new IllegalArgumentException
-                (sm.getString("standardEngine.notHost"));
+                    (sm.getString("standardEngine.notHost"));
         super.addChild(child);
 
     }
@@ -226,7 +226,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     public void setParent(Container container) {
 
         throw new IllegalArgumentException
-            (sm.getString("standardEngine.notParent"));
+                (sm.getString("standardEngine.notParent"));
 
     }
 
@@ -241,21 +241,20 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Start this component and implement the requirements
+     * 启动Engine组件、实现需求
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @throws LifecycleException 如果此组件检测到致命错误,这将阻止该组件被使用
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
         // Log our server identification information
-        if(log.isInfoEnabled()) {
-            log.info( "Starting Servlet Engine: " + ServerInfo.getServerInfo());
+        if (log.isInfoEnabled()) {
+            log.info("Starting Servlet Engine: " + ServerInfo.getServerInfo());
         }
 
-        // Standard container startup
+        // 由父类启动标准容器启动
         super.startInternal();
     }
 
@@ -268,7 +267,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     @Override
     public void logAccess(Request request, Response response, long time,
-            boolean useDefault) {
+                          boolean useDefault) {
 
         boolean logged = false;
 
@@ -420,7 +419,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         private volatile boolean disabled = false;
 
         public AccessLogListener(StandardEngine engine, Host host,
-                Context context) {
+                                 Context context) {
             this.engine = engine;
             this.host = host;
             this.context = context;
