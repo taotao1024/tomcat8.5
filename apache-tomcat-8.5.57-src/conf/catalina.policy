@@ -27,9 +27,9 @@
 
 
 // ========== SYSTEM CODE PERMISSIONS =========================================
+// ==========    JDK      相关包权限   =========================================
 
-
-// These permissions apply to javac
+// 这些权限适用于javac
 grant codeBase "file:${java.home}/lib/-" {
         permission java.security.AllPermission;
 };
@@ -52,6 +52,7 @@ grant codeBase "file:${java.home}/lib/ext/-" {
 
 
 // ========== CATALINA CODE PERMISSIONS =======================================
+// ========== Tomcat      包相关的权限   =======================================
 
 
 // These permissions apply to the daemon code
@@ -121,6 +122,7 @@ grant codeBase "file:${catalina.home}/lib/-" {
 
 
 // ========== WEB APPLICATION PERMISSIONS =====================================
+// ========== WEB      应用       权限     =====================================
 
 
 // These permissions are granted by default to all web applications

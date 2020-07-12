@@ -24,7 +24,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
+ * <p><strong>规则集</strong> for processing the contents of a
  * Engine definition element.  This <code>RuleSet</code> does NOT include
  * any rules for nested Host elements, which should be added via instances of
  * <code>HostRuleSet</code>.</p>
@@ -82,7 +82,7 @@ public class EngineRuleSet extends RuleSetBase {
      */
     @Override
     public void addRuleInstances(Digester digester) {
-
+        //创建Engine实例 添加是生命周期监听器EngineConfig(默认添加)
         digester.addObjectCreate(prefix + "Engine",
                                  "org.apache.catalina.core.StandardEngine",
                                  "className");
@@ -95,7 +95,7 @@ public class EngineRuleSet extends RuleSetBase {
                             "setContainer",
                             "org.apache.catalina.Engine");
 
-        //Cluster configuration start
+        //为Engine添加集群配置 具体的集群实现由ClassName属性指定
         digester.addObjectCreate(prefix + "Engine/Cluster",
                                  null, // MUST be specified in the element
                                  "className");
@@ -103,8 +103,7 @@ public class EngineRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "Engine/Cluster",
                             "setCluster",
                             "org.apache.catalina.Cluster");
-        //Cluster configuration end
-
+        // 为Engine添加声明周期监听器
         digester.addObjectCreate(prefix + "Engine/Listener",
                                  null, // MUST be specified in the element
                                  "className");
@@ -113,7 +112,7 @@ public class EngineRuleSet extends RuleSetBase {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
-
+        // 为Engine添加安全配置以及拦截器Value 具体的拦截器类有ClassName属性指定
         digester.addRuleSet(new RealmRuleSet(prefix + "Engine/"));
 
         digester.addObjectCreate(prefix + "Engine/Valve",

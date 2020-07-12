@@ -24,7 +24,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
+ * <p><strong>规则集</strong> for processing the contents of a
  * Host definition element.  This <code>RuleSet</code> does NOT include
  * any rules for nested Context which should be added via instances of
  * <code>ContextRuleSet</code>.</p>
@@ -82,7 +82,7 @@ public class HostRuleSet extends RuleSetBase {
      */
     @Override
     public void addRuleInstances(Digester digester) {
-
+        // 创建Host实例 添加声明周期监听器HostConfig 默认添加
         digester.addObjectCreate(prefix + "Host",
                                  "org.apache.catalina.core.StandardHost",
                                  "className");
@@ -100,7 +100,7 @@ public class HostRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "Host/Alias",
                                "addAlias", 0);
 
-        //Cluster configuration start
+        // 为添加Host集群
         digester.addObjectCreate(prefix + "Host/Cluster",
                                  null, // MUST be specified in the element
                                  "className");
@@ -110,6 +110,7 @@ public class HostRuleSet extends RuleSetBase {
                             "org.apache.catalina.Cluster");
         //Cluster configuration end
 
+        // 为Host添加生命周期管理
         digester.addObjectCreate(prefix + "Host/Listener",
                                  null, // MUST be specified in the element
                                  "className");
@@ -117,9 +118,8 @@ public class HostRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "Host/Listener",
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
-
+        // 为Host添加安全配置
         digester.addRuleSet(new RealmRuleSet(prefix + "Host/"));
-
         digester.addObjectCreate(prefix + "Host/Valve",
                                  null, // MUST be specified in the element
                                  "className");
