@@ -354,8 +354,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Log getLogger() {
-        if (logger != null)
+        if (logger != null) {
             return logger;
+        }
         logger = LogFactory.getLog(getLogName());
         return logger;
     }
@@ -399,11 +400,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = clusterLock.readLock();
         readLock.lock();
         try {
-            if (cluster != null)
+            if (cluster != null) {
                 return cluster;
+            }
 
-            if (parent != null)
+            if (parent != null) {
                 return parent.getCluster();
+            }
 
             return null;
         } finally {
@@ -440,8 +443,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldCluster = this.cluster;
-            if (oldCluster == cluster)
+            if (oldCluster == cluster) {
                 return;
+            }
             this.cluster = cluster;
 
             // Stop the old component if necessary
@@ -455,8 +459,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (cluster != null)
+            if (cluster != null) {
                 cluster.setContainer(this);
+            }
 
             if (getState().isAvailable() && (cluster != null) &&
                     (cluster instanceof Lifecycle)) {
@@ -569,8 +574,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (parent != null) {
             return parent.getParentClassLoader();
         }
@@ -617,10 +623,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock l = realmLock.readLock();
         l.lock();
         try {
-            if (realm != null)
+            if (realm != null) {
                 return realm;
-            if (parent != null)
+            }
+            if (parent != null) {
                 return parent.getRealm();
+            }
             return null;
         } finally {
             l.unlock();
@@ -651,8 +659,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             Realm oldRealm = this.realm;
-            if (oldRealm == realm)
+            if (oldRealm == realm) {
                 return;
+            }
             this.realm = realm;
 
             // Stop the old component if necessary
@@ -666,8 +675,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (realm != null)
+            if (realm != null) {
                 realm.setContainer(this);
+            }
             if (getState().isAvailable() && (realm != null) &&
                     (realm instanceof Lifecycle)) {
                 try {
@@ -696,6 +706,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Container as an argument.  This method may thrown an
      * <code>IllegalArgumentException</code> if this Container chooses not
      * to be attached to the specified Container, in which case it is not added
+     * <p>
+     * 添加子容器
      *
      * @param child New child Container to be added
      * @throws IllegalArgumentException if this exception is thrown by
@@ -718,13 +730,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Add child " + child + " " + this);
+        }
         synchronized (children) {
-            if (children.get(child.getName()) != null)
+            if (children.get(child.getName()) != null) {
                 throw new IllegalArgumentException("addChild:  Child name '" +
                         child.getName() +
                         "' is not unique");
+            }
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -845,8 +859,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         synchronized (children) {
-            if (children.get(child.getName()) == null)
+            if (children.get(child.getName()) == null) {
                 return;
+            }
             children.remove(child.getName());
         }
 
@@ -902,7 +917,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // 启动我们的子组件(如果有的话)
+        // 日志处理
         logger = null;
         getLogger();
 
@@ -917,6 +932,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) realm).start();
         }
 
+        // 启动我们的子组件(如果有的话)
         /**
          * 启动子容器<P>
          * 层级调用<P>
@@ -924,14 +940,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase
          * Future同步框架 实现同步启动<P>
          */
         Container[] children = findChildren();
+        // 线程启动的返回值  Future同步框架  用来获取线程信息
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
+            // 启停线程池
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
         MultiThrowable multiThrowable = null;
 
-        // ----------- 子线程启动容器 start -----------
+        // ----------- 子容器初始化、启动 start -----------
         for (Future<Void> result : results) {
             try {
                 result.get();
@@ -948,7 +966,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             throw new LifecycleException(sm.getString("containerBase.threadedStartFailed"),
                     multiThrowable.getThrowable());
         }
-        // ----------- 子线程启动容器  end  -----------
+        // ----------- 子容器初始化、启动  end  -----------
 
         /**
          * 如果有的话，启动管道中的阀门(包括基础阀门)<P>
@@ -962,7 +980,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         /**
          * 设置生命周期状态 -->  HostConfig.start() <P>
-         * 状态的变化会触发监听器
+         * 状态的变化会触发监听器，对子容器进行初始化、启动等操作。
          */
         setState(LifecycleState.STARTING);
 
@@ -1141,8 +1159,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void backgroundProcess() {
 
-        if (!getState().isAvailable())
+        if (!getState().isAvailable()) {
             return;
+        }
 
         Cluster cluster = getClusterInternal();
         if (cluster != null) {
@@ -1209,8 +1228,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
+        if (listeners.size() < 1) {
             return;
+        }
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         // Note for each uses an iterator internally so this is safe
@@ -1290,10 +1310,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected void threadStart() {
 
-        if (thread != null)
+        if (thread != null) {
             return;
-        if (backgroundProcessorDelay <= 0)
+        }
+        if (backgroundProcessorDelay <= 0) {
             return;
+        }
 
         threadDone = false;
         String threadName = "ContainerBackgroundProcessor[" + toString() + "]";
@@ -1310,8 +1332,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected void threadStop() {
 
-        if (thread == null)
+        if (thread == null) {
             return;
+        }
 
         threadDone = true;
         thread.interrupt();

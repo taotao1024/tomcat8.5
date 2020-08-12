@@ -89,6 +89,13 @@ public interface WebResourceRoot extends Lifecycle {
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet.
      *
+     * <br>
+     * 四种方式<P>
+     * pre  ： xml--> <PreResource></PreResource><P>
+     * main ： WEB_INF/lib  calss<P>
+     * jar  :  xml--> <JarResource></JarResource><P>
+     * post :  xml--> <PostResource></PostResource><P>
+     *
      * @param path The path for the resource of interest relative to the root
      *             of the web application. It must start with '/'.
      * @return The object that represents the resource at the given path
@@ -102,6 +109,7 @@ public interface WebResourceRoot extends Lifecycle {
      * WebResourceSet. This will include all matches even if the resource would
      * not normally be accessible (e.g. because it was overridden by another
      * resource)
+     *
      * <br>
      * 四种方式<P>
      * pre  ： xml--> <PreResource></PreResource><P>

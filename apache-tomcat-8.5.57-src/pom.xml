@@ -43,6 +43,7 @@
             </plugin>
         </plugins>
     </build>
+
     <!--Tomcat是java开发的，封装了很多功能，它需要依赖一些基础的jar包-->
     <dependencies>
         <!---easymock辅助单元测试-->
@@ -84,4 +85,5 @@
             <version>4.6.1</version>
         </dependency>
     </dependencies>
+
 </project>

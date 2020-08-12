@@ -76,6 +76,7 @@ public final class Bootstrap {
             try {
                 homeFile = f.getCanonicalFile();
             } catch (IOException ioe) {
+                // 获取tomcat的绝对路径
                 homeFile = f.getAbsoluteFile();
             }
         }
@@ -108,14 +109,14 @@ public final class Bootstrap {
         /**
          * 设置环境变量catalinaHomeFile
          * <P>
-         * 工作目录
+         * 安装目录
          */
         catalinaHomeFile = homeFile;
-        System.setProperty(
-                Constants.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
+        System.setProperty(Constants.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
 
         // Then base
         String base = System.getProperty(Constants.CATALINA_BASE_PROP);
+        // 设置工作目录
         if (base == null) {
             catalinaBaseFile = catalinaHomeFile;
         } else {
@@ -151,6 +152,10 @@ public final class Bootstrap {
 
     /**
      * 实例化类加载器：CommonLoader、CatalinaLoader、SharedLoader
+     * <p>
+     * 破坏双拼委派机制，设置父类加载器为空。
+     * <p>
+     * 优势：不同App之间的Jar不受影响，很大程度上解决了版本冲突问题。
      */
     private void initClassLoaders() {
         try {
@@ -177,7 +182,7 @@ public final class Bootstrap {
      *
      * @param name   自定义加载器名称
      * @param parent 父加载器
-     * @return 类加载器
+     * @return 类加载器实例
      * @throws Exception 类加载器实例化异常
      */
     private ClassLoader createClassLoader(String name, ClassLoader parent)
@@ -268,12 +273,15 @@ public final class Bootstrap {
 
 
     /**
-     * 初始化守护进程。
+     * 功能：<P>
+     * 1、初始化守护进程<P>
+     * 2、初始化类加载器<P>
+     * 3、实例化Catalina对象<P>
      *
      * @throws Exception Fatal initialization error
      */
     public void init() throws Exception {
-        // 初始化类加载器
+        // 初始化类加载器 破坏双拼委派机制
         initClassLoaders();
         // 设置上下文类加载器
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -316,9 +324,9 @@ public final class Bootstrap {
 
         // Call the load() method
         String methodName = "load";
-        Object param[];
-        Class<?> paramTypes[];
-        if (arguments == null || arguments.length == 0) {
+        Object[] param;
+        Class<?>[] paramTypes;
+        if (null == arguments || 0 == arguments.length) {
             paramTypes = null;
             param = null;
         } else {
@@ -333,7 +341,7 @@ public final class Bootstrap {
             log.debug("Calling startup class " + method);
         }
         method.invoke(catalinaDaemon, param);
-        System.out.println("====================  初始化成功 ==================== ");
+        System.out.println("====================  加载 成功 ==================== ");
     }
 
 
@@ -479,32 +487,36 @@ public final class Bootstrap {
 
         synchronized (daemonLock) {
             /**
-             * 守护线程为空 表示Tomcat未启动
+             * 守护线程为空，表示Tomcat未启动。
+             * 初始化Tomcat类加载器。
              */
             if (daemon == null) {
                 // 在init()完成之前，不要设置守护进程。
                 Bootstrap bootstrap = new Bootstrap();
                 try {
+                    // 初始化守护进程、初始化类加载器、实例化Catalina对象
                     bootstrap.init();
                 } catch (Throwable t) {
                     handleThrowable(t);
                     t.printStackTrace();
                     return;
                 }
-                // 设置守护线程
+                // 设置守护线程，引用bootstrap
                 daemon = bootstrap;
             } else {
                 /**
                  * When running as a service the call to stop will be on a new
                  * thread so make sure the correct class loader is used to
                  * prevent a range of class not found exceptions.
-                 *
+                 * 守护线程不为空。tomcat已经启动。
                  * 当作为服务运行时，对stop的调用将在一个新线程上，因此请确保
                  * 使用了正确的类装入器来防止一系列类未发现异常。
                  */
                 Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
             }
         }
+
+        System.out.println("====================  初始化成功 ==================== ");
 
         /**
          * 检测运行时的命令
@@ -533,13 +545,15 @@ public final class Bootstrap {
                  * BootStrap.init()-->Catalina.load()-->StandardServer.init()-->
                  * StandardService.initInternal()-->engine.init()容器-->StandardEngine.initInternal()
                  * StandardService.initInternal()-->executor.init()线程池
-                 * StandardService.initInternal()-->connector.init()连接器 -->ProtocolHandler.init()-->EndPoint
+                 * StandardService.initInternal()-->connector.init()连接器 -->ProtocolHandler.init()协议处理器-->EndPoint端
                  */
                 daemon.load(args);
                 /**
-                 * 启动Tomcat
+                 * 启动Tomcat,反射执行Catalina的start()方法
                  * BootStrap.start()-->Catalina.start()-->StandardServer.startInternal()-->
-                 * StandardService.startInternal()--> engine.start()容器
+                 * StandardService.startInternal()--> engine.start()容器-->StandardHost-->
+                 *                                    ContainerBase-->HostConfig部署应用（三种部署方式）-->
+                 *                                    StandardContext-->StandardWrapper
                  * StandardService.startInternal()--> executor.start()线程池
                  * StandardService.startInternal()--> connector.start()连接器-->ContainerBase.start() 启动所有子容器
                  */

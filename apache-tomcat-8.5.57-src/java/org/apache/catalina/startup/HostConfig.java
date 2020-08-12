@@ -397,8 +397,9 @@ public class HostConfig implements LifecycleListener {
 
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(host.getCatalinaBase(), path);
+        }
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {
@@ -428,7 +429,7 @@ public class HostConfig implements LifecycleListener {
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         /**
          * Deploy XML descriptors from configBase
-         * XML部署
+         * XML部署 : catalina-home/conf/Catalina/localhost
          * <Host>
          *     <Context>
          *         <Wrapper>
@@ -439,12 +440,12 @@ public class HostConfig implements LifecycleListener {
         deployDescriptors(configBase, configBase.list());
         /**
          *  Deploy WARs
-         * 部署Wars Tomcat 每嗝30秒自动扫描
+         * 部署Wars Tomcat 每嗝30秒自动扫描 :  catalina-home/webapps
          */
         deployWARs(appBase, filteredAppPaths);
         /**
          * Deploy expanded folders
-         * 部署扩展文件夹
+         * 部署扩展文件夹 :  catalina-home/
          */
         deployDirectories(appBase, filteredAppPaths);
 
@@ -515,36 +516,38 @@ public class HostConfig implements LifecycleListener {
         }
         // Deploy expanded folder
         File dir = new File(appBase, baseName);
-        if (dir.exists())
+        if (dir.exists()) {
             deployDirectory(cn, dir);
+        }
     }
 
 
     /**
-     * Deploy XML context descriptors.
+     * XML部署
      *
      * @param configBase The config base
      * @param files      The XML descriptors which should be deployed
      */
     protected void deployDescriptors(File configBase, String[] files) {
 
-        if (files == null)
+        if (files == null) {
             return;
+        }
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
         for (String file : files) {
             File contextXml = new File(configBase, file);
-
+            // 解析指定路径的XML文件
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
                 ContextName cn = new ContextName(file, true);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName())) {
                     continue;
+                }
 
-                results.add(
-                        es.submit(new DeployDescriptor(this, cn, contextXml)));
+                results.add(es.submit(new DeployDescriptor(this, cn, contextXml)));
             }
         }
 
@@ -552,8 +555,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 result.get();
             } catch (Exception e) {
-                log.error(sm.getString(
-                        "hostConfig.deployDescriptor.threaded.error"), e);
+                log.error(sm.getString("hostConfig.deployDescriptor.threaded.error"), e);
             }
         }
     }
@@ -570,7 +572,7 @@ public class HostConfig implements LifecycleListener {
 
         DeployedApplication deployedApp =
                 new DeployedApplication(cn.getName(), true);
-
+        // 记录部署时间
         long startTime = 0;
         // Assume this is a configuration descriptor and deploy it
         if (log.isInfoEnabled()) {
@@ -593,6 +595,7 @@ public class HostConfig implements LifecycleListener {
                             "hostConfig.deployDescriptor.error",
                             contextXml.getAbsolutePath()), e);
                 } finally {
+                    // 记录Context节点
                     digester.reset();
                     if (context == null) {
                         context = new FailedContext();
@@ -634,6 +637,7 @@ public class HostConfig implements LifecycleListener {
                 }
             }
 
+            // 添加到子节点中、启动Context
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -716,25 +720,28 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Deploy WAR files.
+     * 部署Wars
      *
      * @param appBase The base path for applications
      * @param files   The WARs to deploy
      */
     protected void deployWARs(File appBase, String[] files) {
 
-        if (files == null)
+        if (files == null) {
             return;
+        }
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
         for (String file : files) {
 
-            if (file.equalsIgnoreCase("META-INF"))
+            if (file.equalsIgnoreCase("META-INF")) {
                 continue;
-            if (file.equalsIgnoreCase("WEB-INF"))
+            }
+            if (file.equalsIgnoreCase("WEB-INF")) {
                 continue;
+            }
             File war = new File(appBase, file);
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                     war.isFile() && !invalidWars.contains(file)) {
@@ -1258,15 +1265,17 @@ public class HostConfig implements LifecycleListener {
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResource);
                 } else {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("Ignoring non-existent WatchedResource '" +
                                 resource.getAbsolutePath() + "'");
+                    }
                     continue;
                 }
             }
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Watching WatchedResource '" +
                         resource.getAbsolutePath() + "'");
+            }
             app.reloadResources.put(resource.getAbsolutePath(),
                     Long.valueOf(resource.lastModified()));
         }
@@ -1310,9 +1319,10 @@ public class HostConfig implements LifecycleListener {
                 System.currentTimeMillis() - FILE_MODIFICATION_RESOLUTION_MS;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Checking context[" + app.name +
                         "] redeploy resource " + resource);
+            }
             long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
             if (resource.exists() || lastModified == 0) {
@@ -1424,8 +1434,9 @@ public class HostConfig implements LifecycleListener {
      *       ignored.
      */
     private void reload(DeployedApplication app, File fileToRemove, String newDocBase) {
-        if (log.isInfoEnabled())
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.reload", app.name));
+        }
         Context context = (Context) host.findChild(app.name);
         if (context.getState().isAvailable()) {
             if (fileToRemove != null && newDocBase != null) {
@@ -1451,8 +1462,9 @@ public class HostConfig implements LifecycleListener {
 
 
     private void undeploy(DeployedApplication app) {
-        if (log.isInfoEnabled())
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.undeploy", app.name));
+        }
         Container context = host.findChild(app.name);
         try {
             host.removeChild(context);
@@ -1622,8 +1634,9 @@ public class HostConfig implements LifecycleListener {
      */
     public void stop() {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("hostConfig.stop"));
+        }
 
         if (oname != null) {
             try {
@@ -1646,8 +1659,9 @@ public class HostConfig implements LifecycleListener {
             DeployedApplication[] apps =
                     deployed.values().toArray(new DeployedApplication[0]);
             for (DeployedApplication app : apps) {
-                if (!isServiced(app.name))
+                if (!isServiced(app.name)) {
                     checkResources(app, false);
+                }
             }
 
             // Check for old versions of applications that can now be undeployed
@@ -1745,8 +1759,9 @@ public class HostConfig implements LifecycleListener {
 
         String contextName = context.getName();
 
-        if (deployed.containsKey(contextName))
+        if (deployed.containsKey(contextName)) {
             return;
+        }
 
         DeployedApplication deployedApp =
                 new DeployedApplication(contextName, false);
@@ -1853,6 +1868,9 @@ public class HostConfig implements LifecycleListener {
         public boolean loggedDirWarning = false;
     }
 
+    /**
+     * 内部类 部署
+     */
     private static class DeployDescriptor implements Runnable {
 
         private HostConfig config;
