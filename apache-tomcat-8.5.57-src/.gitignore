@@ -56,7 +56,7 @@ webapps/docs/jdbc-pool.xml
 *.rar
 
 # Compiled class file
-target
+target/*
 *.class
 
 # Log file
