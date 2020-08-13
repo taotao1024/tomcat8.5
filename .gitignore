@@ -22,3 +22,17 @@ target/*
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/.idea/libraries/Maven__javax_xml_jaxrpc_api_1_1.xml
+/.idea/libraries/Maven__junit_junit_4_12.xml
+/.idea/libraries/Maven__org_apache_ant_ant_1_7_0.xml
+/.idea/libraries/Maven__org_apache_ant_ant_launcher_1_7_0.xml
+/.idea/libraries/Maven__org_easymock_easymock_3_5.xml
+/.idea/libraries/Maven__org_eclipse_jdt_core_compiler_ecj_4_6_1.xml
+/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml
+/.idea/libraries/Maven__org_objenesis_objenesis_2_6.xml
+/.idea/libraries/Maven__wsdl4j_wsdl4j_1_6_2.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
