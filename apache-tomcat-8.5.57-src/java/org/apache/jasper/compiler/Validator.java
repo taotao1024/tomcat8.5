@@ -195,8 +195,9 @@ class Validator {
                                 pageInfo.getInfo(), value);
                     }
                 } else if ("pageEncoding".equals(attr)) {
-                    if (pageEncodingSeen)
+                    if (pageEncodingSeen) {
                         err.jspError(n, "jsp.error.page.multi.pageencoding");
+                    }
                     // 'pageEncoding' can occur at most once per file
                     pageEncodingSeen = true;
                     String actual = comparePageEncodings(value, n);
@@ -232,8 +233,9 @@ class Validator {
             }
 
             // Check for bad combinations
-            if (pageInfo.getBuffer() == 0 && !pageInfo.isAutoFlush())
+            if (pageInfo.getBuffer() == 0 && !pageInfo.isAutoFlush()) {
                 err.jspError(n, "jsp.error.page.badCombo");
+            }
 
             // Attributes for imports for this node have been processed by
             // the parsers, just add them to pageInfo.
@@ -268,8 +270,9 @@ class Validator {
                                 pageInfo.getIsELIgnored(), value);
                     }
                 } else if ("pageEncoding".equals(attr)) {
-                    if (pageEncodingSeen)
+                    if (pageEncodingSeen) {
                         err.jspError(n, "jsp.error.tag.multi.pageencoding");
+                    }
                     pageEncodingSeen = true;
                     compareTagEncodings(value, n);
                     n.getRoot().setPageEncoding(value);
@@ -617,8 +620,9 @@ class Validator {
             boolean valueSpecified = n.getValue() != null;
 
             if ("*".equals(property)) {
-                if (param != null || valueSpecified)
+                if (param != null || valueSpecified) {
                     err.jspError(n, "jsp.error.setProperty.invalid");
+                }
 
             } else if (param != null && valueSpecified) {
                 err.jspError(n, "jsp.error.setProperty.invalid");
@@ -638,23 +642,28 @@ class Validator {
             String type = n.getTextAttribute("type");
             BeanRepository beanInfo = pageInfo.getBeanRepository();
 
-            if (className == null && type == null)
+            if (className == null && type == null) {
                 err.jspError(n, "jsp.error.usebean.missingType");
+            }
 
-            if (beanInfo.checkVariable(name))
+            if (beanInfo.checkVariable(name)) {
                 err.jspError(n, "jsp.error.usebean.duplicate");
+            }
 
-            if ("session".equals(scope) && !pageInfo.isSession())
+            if ("session".equals(scope) && !pageInfo.isSession()) {
                 err.jspError(n, "jsp.error.usebean.noSession");
+            }
 
             Node.JspAttribute jattr = getJspAttribute(null, "beanName", null,
                     null, n.getAttributeValue("beanName"), n, null, false);
             n.setBeanName(jattr);
-            if (className != null && jattr != null)
+            if (className != null && jattr != null) {
                 err.jspError(n, "jsp.error.usebean.notBoth");
+            }
 
-            if (className == null)
+            if (className == null) {
                 className = type;
+            }
 
             beanInfo.addBean(n, name, className, scope);
 
@@ -679,12 +688,15 @@ class Validator {
             throwErrorIfExpression(n, "iepluginurl", "jsp:plugin");
 
             String type = n.getTextAttribute("type");
-            if (type == null)
+            if (type == null) {
                 err.jspError(n, "jsp.error.plugin.notype");
-            if (!type.equals("bean") && !type.equals("applet"))
+            }
+            if (!type.equals("bean") && !type.equals("applet")) {
                 err.jspError(n, "jsp.error.plugin.badtype");
-            if (n.getTextAttribute("code") == null)
+            }
+            if (n.getTextAttribute("code") == null) {
                 err.jspError(n, "jsp.error.plugin.nocode");
+            }
 
             Node.JspAttribute width = getJspAttribute(null, "width", null,
                     null, n.getAttributeValue("width"), n, null, false);
@@ -734,8 +746,9 @@ class Validator {
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
             // exit if we are ignoring EL all together
-            if (pageInfo.isELIgnored())
+            if (pageInfo.isELIgnored()) {
                 return;
+            }
 
             // JSP.2.2 - '#{' not allowed in template text
             if (n.getType() == '#') {
@@ -1883,8 +1896,9 @@ class Validator {
 
         for (Object o : compiler.getPageInfo().getTaglibs()) {
 
-            if (!(o instanceof TagLibraryInfoImpl))
+            if (!(o instanceof TagLibraryInfoImpl)) {
                 continue;
+            }
             TagLibraryInfoImpl tli = (TagLibraryInfoImpl) o;
 
             ValidationMessage[] errors = tli.validate(xmlView);

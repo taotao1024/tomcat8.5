@@ -218,8 +218,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             filter.setBuffer(inputStreamInputBuffer);
         } else {
             for (int i = 0; i <= lastActiveFilter; i++) {
-                if (activeFilters[i] == filter)
+                if (activeFilters[i] == filter) {
                     return;
+                }
             }
             filter.setBuffer(activeFilters[lastActiveFilter]);
         }
@@ -248,20 +249,22 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
 
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return inputStreamInputBuffer.doRead(chunk);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doRead(chunk);
+        }
 
     }
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
 
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return inputStreamInputBuffer.doRead(handler);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doRead(handler);
+        }
 
     }
 
@@ -415,7 +418,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
                     if (!fill(false)) // request line parsing
+                    {
                         return false;
+                    }
                 }
                 // Spec says method name is a token followed by a single SP but
                 // also be tolerant of multiple SP and/or HT.
@@ -441,7 +446,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
                     if (!fill(false)) // request line parsing
+                    {
                         return false;
+                    }
                 }
                 chr = byteBuffer.get();
                 if (!(chr == Constants.SP || chr == Constants.HT)) {
@@ -464,7 +471,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
                     if (!fill(false)) // request line parsing
+                    {
                         return false;
+                    }
                 }
                 int pos = byteBuffer.position();
                 prevChr = chr;
@@ -535,7 +544,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
                     if (!fill(false)) // request line parsing
+                    {
                         return false;
+                    }
                 }
                 byte chr = byteBuffer.get();
                 if (!(chr == Constants.SP || chr == Constants.HT)) {
@@ -558,7 +569,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
                     if (!fill(false)) // request line parsing
+                    {
                         return false;
+                    }
                 }
 
                 int pos = byteBuffer.position();
@@ -1134,8 +1147,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             if (byteBuffer.position() >= byteBuffer.limit()) {
                 // The application is reading the HTTP request body which is
                 // always a blocking operation.
-                if (!fill(true))
+                if (!fill(true)) {
                     return -1;
+                }
             }
 
             int length = byteBuffer.remaining();
@@ -1151,8 +1165,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             if (byteBuffer.position() >= byteBuffer.limit()) {
                 // The application is reading the HTTP request body which is
                 // always a blocking operation.
-                if (!fill(true))
+                if (!fill(true)) {
                     return -1;
+                }
             }
 
             int length = byteBuffer.remaining();

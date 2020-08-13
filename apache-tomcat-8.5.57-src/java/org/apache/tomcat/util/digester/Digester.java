@@ -1058,8 +1058,9 @@ public class Digester extends DefaultHandler2 {
         }
         try {
             stack.pop();
-            if (stack.empty())
+            if (stack.empty()) {
                 namespaces.remove(prefix);
+            }
         } catch (EmptyStackException e) {
             throw createSAXException("endPrefixMapping popped too many times");
         }

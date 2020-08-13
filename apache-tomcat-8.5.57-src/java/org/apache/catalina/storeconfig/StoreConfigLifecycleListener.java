@@ -87,10 +87,13 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             storeConfig = (IStoreConfig) clazz.getConstructor().newInstance();
             if (null == getStoreRegistry())
                 // default Loading
+            {
                 loader.load();
-            else
+            } else
                 // load a special file registry (url)
+            {
                 loader.load(getStoreRegistry());
+            }
             // use the loader Registry
             storeConfig.setRegistry(loader.getRegistry());
             storeConfig.setServer(server);

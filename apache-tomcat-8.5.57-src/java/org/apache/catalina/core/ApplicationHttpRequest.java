@@ -275,8 +275,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public void removeAttribute(String name) {
 
-        if (!removeSpecial(name))
+        if (!removeSpecial(name)) {
             getRequest().removeAttribute(name);
+        }
 
     }
 
@@ -315,8 +316,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
-        if (context == null)
+        if (context == null) {
             return null;
+        }
 
         if (path == null) {
             return null;
@@ -336,8 +338,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         // Convert a request-relative path to a context-relative one
         String servletPath =
             (String) getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
-        if (servletPath == null)
+        if (servletPath == null) {
             servletPath = getServletPath();
+        }
 
         // Add the path info, if there is any
         String pathInfo = getPathInfo();
@@ -499,8 +502,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         StringBuffer url = new StringBuffer();
         String scheme = getScheme();
         int port = getServerPort();
-        if (port < 0)
+        if (port < 0) {
             port = 80; // Work around java.net.URL bug
+        }
 
         url.append(scheme);
         url.append("://");
@@ -554,8 +558,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (crossContext) {
 
             // There cannot be a session if no context has been assigned yet
-            if (context == null)
+            if (context == null) {
                 return null;
+            }
 
             // Return the current session if it exists and is valid
             if (session != null && session.isValid()) {
@@ -612,13 +617,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (crossContext) {
 
             String requestedSessionId = getRequestedSessionId();
-            if (requestedSessionId == null)
+            if (requestedSessionId == null) {
                 return false;
-            if (context == null)
+            }
+            if (context == null) {
                 return false;
+            }
             Manager manager = context.getManager();
-            if (manager == null)
+            if (manager == null) {
                 return false;
+            }
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
@@ -792,8 +800,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected boolean isSpecial(String name) {
 
         for (String special : specials) {
-            if (special.equals(name))
+            if (special.equals(name)) {
                 return true;
+            }
         }
         return false;
 
@@ -886,8 +895,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     private void mergeParameters() {
 
-        if ((queryParamString == null) || (queryParamString.length() < 1))
+        if ((queryParamString == null) || (queryParamString.length() < 1)) {
             return;
+        }
 
         // Parse the query string from the dispatch target
         Parameters paramParser = new Parameters();

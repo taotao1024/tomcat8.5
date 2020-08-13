@@ -113,8 +113,9 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 setProperty(resultproperty + ".Length",Integer.toString(names.size()));
             }
         } catch (Exception e) {
-            if (isEcho())
+            if (isEcho()) {
                 handleErrorOutput(e.getMessage());
+            }
             return "Can't query mbeans " + qry;
         }
 
@@ -142,8 +143,9 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
             Object value = null;
 
             for (MBeanAttributeInfo attr : attrs) {
-                if (!attr.isReadable())
+                if (!attr.isReadable()) {
                     continue;
+                }
                 String attName = attr.getName();
                 if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
                         || attName.indexOf(' ') >= 0) {
@@ -154,16 +156,19 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                     value = jmxServerConnection
                             .getAttribute(oname, attName);
                 } catch (Exception e) {
-                    if (isEcho())
+                    if (isEcho()) {
                         handleErrorOutput("Error getting attribute "
                                 + oname + " " + pname + attName + " "
                                 + e.toString());
+                    }
                     continue;
                 }
-                if (value == null)
+                if (value == null) {
                     continue;
-                if ("modelerType".equals(attName))
+                }
+                if ("modelerType".equals(attName)) {
                     continue;
+                }
                 createProperty(pname + attName, value);
             }
         } catch (Exception e) {

@@ -45,14 +45,16 @@ public class NamingResourcesSF extends StoreFactoryBase {
         StoreDescription elementDesc = getRegistry().findDescription(
                 aElement.getClass());
         if (elementDesc != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("store " + elementDesc.getTag() + "( " + aElement
                         + " )");
+            }
             storeChildren(aWriter, indent, aElement, elementDesc);
         } else {
-            if (log.isWarnEnabled())
+            if (log.isWarnEnabled()) {
                 log.warn("Descriptor for element" + aElement.getClass()
                         + " not configured!");
+            }
         }
     }
 

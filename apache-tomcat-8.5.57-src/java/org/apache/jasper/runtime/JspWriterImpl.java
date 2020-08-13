@@ -68,8 +68,9 @@ public class JspWriterImpl extends JspWriter {
     public JspWriterImpl(ServletResponse response, int sz,
             boolean autoFlush) {
         super(sz, autoFlush);
-        if (sz < 0)
+        if (sz < 0) {
             throw new IllegalArgumentException("Buffer size <= 0");
+        }
         this.response = response;
         cb = sz == 0 ? null : new char[sz];
         nextChar = 0;
@@ -77,8 +78,9 @@ public class JspWriterImpl extends JspWriter {
 
     void init( ServletResponse response, int sz, boolean autoFlush ) {
         this.response= response;
-        if( sz > 0 && ( cb == null || sz > cb.length ) )
+        if( sz > 0 && ( cb == null || sz > cb.length ) ) {
             cb=new char[sz];
+        }
         nextChar = 0;
         this.autoFlush=autoFlush;
         this.bufferSize=sz;
@@ -102,12 +104,14 @@ public class JspWriterImpl extends JspWriter {
      * @throws IOException Error writing buffered data
      */
     protected final void flushBuffer() throws IOException {
-        if (bufferSize == 0)
+        if (bufferSize == 0) {
             return;
+        }
         flushed = true;
         ensureOpen();
-        if (nextChar == 0)
+        if (nextChar == 0) {
             return;
+        }
         initOut();
         out.write(cb, 0, nextChar);
         nextChar = 0;
@@ -139,20 +143,24 @@ public class JspWriterImpl extends JspWriter {
     public final void clear() throws IOException {
         if ((bufferSize == 0) && (out != null))
             // clear() is illegal after any unbuffered output (JSP.5.5)
+        {
             throw new IllegalStateException(
                     getLocalizeMessage("jsp.error.ise_on_clear"));
-        if (flushed)
+        }
+        if (flushed) {
             throw new IOException(
                     getLocalizeMessage("jsp.error.attempt_to_clear_flushed_buffer"));
+        }
         ensureOpen();
         nextChar = 0;
     }
 
     @Override
     public void clearBuffer() throws IOException {
-        if (bufferSize == 0)
+        if (bufferSize == 0) {
             throw new IllegalStateException(
                     getLocalizeMessage("jsp.error.ise_on_clear"));
+        }
         ensureOpen();
         nextChar = 0;
     }
@@ -181,10 +189,13 @@ public class JspWriterImpl extends JspWriter {
     public void close() throws IOException {
         if (response == null || closed)
             // multiple calls to close is OK
+        {
             return;
+        }
         flush();
-        if (out != null)
+        if (out != null) {
             out.close();
+        }
         out = null;
         closed = true;
     }
@@ -199,8 +210,9 @@ public class JspWriterImpl extends JspWriter {
 
     /** check to make sure that the stream has not been closed */
     private void ensureOpen() throws IOException {
-        if (response == null || closed)
+        if (response == null || closed) {
             throw new IOException("Stream closed");
+        }
     }
 
 
@@ -214,11 +226,13 @@ public class JspWriterImpl extends JspWriter {
             initOut();
             out.write(c);
         } else {
-            if (nextChar >= bufferSize)
-                if (autoFlush)
+            if (nextChar >= bufferSize) {
+                if (autoFlush) {
                     flushBuffer();
-                else
+                } else {
                     bufferOverflow();
+                }
+            }
             cb[nextChar++] = (char) c;
         }
     }
@@ -228,7 +242,9 @@ public class JspWriterImpl extends JspWriter {
      * out of file descriptors and we're trying to print a stack trace.
      */
     private static int min(int a, int b) {
-        if (a < b) return a;
+        if (a < b) {
+            return a;
+        }
         return b;
     }
 
@@ -269,10 +285,11 @@ public class JspWriterImpl extends JspWriter {
             /* If the request length exceeds the size of the output buffer,
              flush the buffer and then write the data directly.  In this
              way buffered streams will cascade harmlessly. */
-            if (autoFlush)
+            if (autoFlush) {
                 flushBuffer();
-            else
+            } else {
                 bufferOverflow();
+            }
             initOut();
             out.write(cbuf, off, len);
             return;
@@ -284,11 +301,13 @@ public class JspWriterImpl extends JspWriter {
             System.arraycopy(cbuf, b, cb, nextChar, d);
             b += d;
             nextChar += d;
-            if (nextChar >= bufferSize)
-                if (autoFlush)
+            if (nextChar >= bufferSize) {
+                if (autoFlush) {
                     flushBuffer();
-                else
+                } else {
                     bufferOverflow();
+                }
+            }
         }
 
     }
@@ -323,11 +342,13 @@ public class JspWriterImpl extends JspWriter {
             s.getChars(b, b + d, cb, nextChar);
             b += d;
             nextChar += d;
-            if (nextChar >= bufferSize)
-                if (autoFlush)
+            if (nextChar >= bufferSize) {
+                if (autoFlush) {
                     flushBuffer();
-                else
+                } else {
                     bufferOverflow();
+                }
+            }
         }
     }
 

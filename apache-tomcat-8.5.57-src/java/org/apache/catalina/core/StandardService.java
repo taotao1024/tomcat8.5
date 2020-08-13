@@ -283,8 +283,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                     break;
                 }
             }
-            if (j < 0)
+            if (j < 0) {
                 return;
+            }
             if (connectors[j].getState().isAvailable()) {
                 try {
                     connectors[j].stop();
@@ -298,8 +299,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             int k = 0;
             Connector results[] = new Connector[connectors.length - 1];
             for (int i = 0; i < connectors.length; i++) {
-                if (i != j)
+                if (i != j) {
                     results[k++] = connectors[i];
+                }
             }
             connectors = results;
 
@@ -378,8 +380,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public Executor getExecutor(String executorName) {
         synchronized (executors) {
             for (Executor executor : executors) {
-                if (executorName.equals(executor.getName()))
+                if (executorName.equals(executor.getName())) {
                     return executor;
+                }
             }
         }
         return null;
@@ -486,8 +489,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
-        if (log.isInfoEnabled())
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("standardService.stop.name", this.name));
+        }
         setState(LifecycleState.STOPPING);
 
         // Stop our defined Container second
@@ -612,8 +616,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (server != null) {
             return server.getParentClassLoader();
         }

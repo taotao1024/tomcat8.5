@@ -170,7 +170,9 @@ final class StandardWrapperValve
         MessageBytes requestPathMB = request.getRequestPathMB();
         // 获取类型
         DispatcherType dispatcherType = DispatcherType.REQUEST;
-        if (request.getDispatcherType() == DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
+        if (request.getDispatcherType() == DispatcherType.ASYNC) {
+            dispatcherType = DispatcherType.ASYNC;
+        }
         request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, dispatcherType);
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);

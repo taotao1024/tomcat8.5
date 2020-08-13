@@ -41,14 +41,16 @@ public class WatchedResourceSF extends StoreFactoryBase {
             String[] resources = ((StandardContext) aElement)
                     .findWatchedResources();
             if (elementDesc != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("store " + elementDesc.getTag() + "( " + aElement
                             + " )");
+                }
                 getStoreAppender().printTagArray(aWriter, "WatchedResource",
                         indent, resources);
             }
-        } else
+        } else {
             log.warn("Descriptor for element" + aElement.getClass()
                     + ".[WatchedResource] not configured!");
+        }
     }
 }

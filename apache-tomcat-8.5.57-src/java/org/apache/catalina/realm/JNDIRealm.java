@@ -738,10 +738,11 @@ public class JNDIRealm extends RealmBase {
     public void setUserSearch(String userSearch) {
 
         this.userSearch = userSearch;
-        if (userSearch == null)
+        if (userSearch == null) {
             userSearchFormat = null;
-        else
+        } else {
             userSearchFormat = new MessageFormat(userSearch);
+        }
 
     }
 
@@ -817,10 +818,11 @@ public class JNDIRealm extends RealmBase {
     public void setRoleBase(String roleBase) {
 
         this.roleBase = roleBase;
-        if (roleBase == null)
+        if (roleBase == null) {
             roleBaseFormat = null;
-        else
+        } else {
             roleBaseFormat = new MessageFormat(roleBase);
+        }
 
     }
 
@@ -865,10 +867,11 @@ public class JNDIRealm extends RealmBase {
     public void setRoleSearch(String roleSearch) {
 
         this.roleSearch = roleSearch;
-        if (roleSearch == null)
+        if (roleSearch == null) {
             roleFormat = null;
-        else
+        } else {
             roleFormat = new MessageFormat(roleSearch);
+        }
 
     }
 
@@ -981,9 +984,9 @@ public class JNDIRealm extends RealmBase {
     public void setUserPattern(String userPattern) {
 
         this.userPattern = userPattern;
-        if (userPattern == null)
+        if (userPattern == null) {
             userPatternArray = null;
-        else {
+        } else {
             userPatternArray = parseUserPatternString(userPattern);
             int len = this.userPatternArray.length;
             userPatternFormatArray = new MessageFormat[len];
@@ -1323,8 +1326,9 @@ public class JNDIRealm extends RealmBase {
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
-                if (context != null)
+                if (context != null) {
                     close(context);
+                }
 
                 // open a new directory context.
                 context = open();
@@ -1346,12 +1350,14 @@ public class JNDIRealm extends RealmBase {
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
             // Close the connection so that it gets reopened next time
-            if (context != null)
+            if (context != null) {
                 close(context);
+            }
 
             // Return "not authenticated" for this request
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("Returning null principal.");
+            }
             return null;
 
         }
@@ -1384,8 +1390,9 @@ public class JNDIRealm extends RealmBase {
 
         if (username == null || username.equals("")
             || credentials == null || credentials.equals("")) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("username null or empty: returning null principal.");
+            }
             return null;
         }
 
@@ -1420,12 +1427,14 @@ public class JNDIRealm extends RealmBase {
         } else {
             // Retrieve user information
             User user = getUser(context, username, credentials);
-            if (user == null)
+            if (user == null) {
                 return null;
+            }
 
             // Check the user's credentials
-            if (!checkCredentials(context, user, credentials))
+            if (!checkCredentials(context, user, credentials)) {
                 return null;
+            }
 
             // Search for additional roles
             List<String> roles = getRoles(context, user);
@@ -1504,10 +1513,12 @@ public class JNDIRealm extends RealmBase {
 
         // Get attributes to retrieve from user entry
         ArrayList<String> list = new ArrayList<>();
-        if (userPassword != null)
+        if (userPassword != null) {
             list.add(userPassword);
-        if (userRoleName != null)
+        }
+        if (userRoleName != null) {
             list.add(userRoleName);
+        }
         if (userRoleAttribute != null) {
             list.add(userRoleAttribute);
         }
@@ -1578,13 +1589,15 @@ public class JNDIRealm extends RealmBase {
         } catch (NameNotFoundException e) {
             return null;
         }
-        if (attrs == null)
+        if (attrs == null) {
             return null;
+        }
 
         // Retrieve value of userPassword
         String password = null;
-        if (userPassword != null)
+        if (userPassword != null) {
             password = getAttributeValue(userPassword, attrs);
+        }
 
         String userRoleAttrValue = null;
         if (userRoleAttribute != null) {
@@ -1593,8 +1606,9 @@ public class JNDIRealm extends RealmBase {
 
         // Retrieve values of userRoleName attribute
         ArrayList<String> roles = null;
-        if (userRoleName != null)
+        if (userRoleName != null) {
             roles = addAttributeValues(userRoleName, attrs, roles);
+        }
 
         return new User(username, dn, password, roles, userRoleAttrValue);
     }
@@ -1624,8 +1638,9 @@ public class JNDIRealm extends RealmBase {
 
         User user = null;
 
-        if (username == null || userPatternFormatArray[curUserPattern] == null)
+        if (username == null || userPatternFormatArray[curUserPattern] == null) {
             return null;
+        }
 
         // Form the dn from the user pattern
         String dn = userPatternFormatArray[curUserPattern].format(new String[] { username });
@@ -1665,8 +1680,9 @@ public class JNDIRealm extends RealmBase {
                                    String[] attrIds)
         throws NamingException {
 
-        if (username == null || userSearchFormat == null)
+        if (username == null || userSearchFormat == null) {
             return null;
+        }
 
         // Form the search filter
         String filter = userSearchFormat.format(new String[] { username });
@@ -1684,8 +1700,9 @@ public class JNDIRealm extends RealmBase {
         constraints.setTimeLimit(timeLimit);
 
         // Specify the attributes to be retrieved
-        if (attrIds == null)
+        if (attrIds == null) {
             attrIds = new String[0];
+        }
         constraints.setReturningAttributes(attrIds);
 
         NamingEnumeration<SearchResult> results =
@@ -1698,10 +1715,11 @@ public class JNDIRealm extends RealmBase {
                     return null;
                 }
             } catch (PartialResultException ex) {
-                if (!adCompat)
+                if (!adCompat) {
                     throw ex;
-                else
+                } else {
                     return null;
+                }
             }
 
             // Get result for the first entry found
@@ -1710,29 +1728,34 @@ public class JNDIRealm extends RealmBase {
             // Check no further entries were found
             try {
                 if (results.hasMore()) {
-                    if(containerLog.isInfoEnabled())
+                    if(containerLog.isInfoEnabled()) {
                         containerLog.info("username " + username + " has multiple entries");
+                    }
                     return null;
                 }
             } catch (PartialResultException ex) {
-                if (!adCompat)
+                if (!adCompat) {
                     throw ex;
+                }
             }
 
             String dn = getDistinguishedName(context, userBase, result);
 
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace("  entry found for " + username + " with dn " + dn);
+            }
 
             // Get the entry's attributes
             Attributes attrs = result.getAttributes();
-            if (attrs == null)
+            if (attrs == null) {
                 return null;
+            }
 
             // Retrieve value of userPassword
             String password = null;
-            if (userPassword != null)
+            if (userPassword != null) {
                 password = getAttributeValue(userPassword, attrs);
+            }
 
             String userRoleAttrValue = null;
             if (userRoleAttribute != null) {
@@ -1741,8 +1764,9 @@ public class JNDIRealm extends RealmBase {
 
             // Retrieve values of userRoleName attribute
             ArrayList<String> roles = null;
-            if (userRoleName != null)
+            if (userRoleName != null) {
                 roles = addAttributeValues(userRoleName, attrs, roles);
+            }
 
             return new User(username, dn, password, roles, userRoleAttrValue);
         } finally {
@@ -1810,11 +1834,13 @@ public class JNDIRealm extends RealmBase {
         throws NamingException {
 
         // Validate the credentials specified by the user
-        if (containerLog.isTraceEnabled())
+        if (containerLog.isTraceEnabled()) {
             containerLog.trace("  validating credentials");
+        }
 
-        if (info == null || credentials == null)
+        if (info == null || credentials == null) {
             return false;
+        }
 
         String password = info.getPassword();
 
@@ -1836,12 +1862,14 @@ public class JNDIRealm extends RealmBase {
                                   String credentials)
          throws NamingException {
 
-         if (credentials == null || user == null)
+         if (credentials == null || user == null) {
              return false;
+         }
 
          String dn = user.getDN();
-         if (dn == null)
+         if (dn == null) {
              return false;
+         }
 
          // Validate the credentials specified by the user
          if (containerLog.isTraceEnabled()) {
@@ -1926,18 +1954,21 @@ public class JNDIRealm extends RealmBase {
     protected List<String> getRoles(DirContext context, User user)
         throws NamingException {
 
-        if (user == null)
+        if (user == null) {
             return null;
+        }
 
         String dn = user.getDN();
         String username = user.getUserName();
         String userRoleId = user.getUserRoleId();
 
-        if (dn == null || username == null)
+        if (dn == null || username == null) {
             return null;
+        }
 
-        if (containerLog.isTraceEnabled())
+        if (containerLog.isTraceEnabled()) {
             containerLog.trace("  getRoles(" + dn + ")");
+        }
 
         // Start with roles retrieved from the user entry
         List<String> list = new ArrayList<>();
@@ -1945,8 +1976,9 @@ public class JNDIRealm extends RealmBase {
         if (userRoles != null) {
             list.addAll(userRoles);
         }
-        if (commonRole != null)
+        if (commonRole != null) {
             list.add(commonRole);
+        }
 
         if (containerLog.isTraceEnabled()) {
             containerLog.trace("  Found " + list.size() + " user internal roles");
@@ -1954,16 +1986,18 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Are we configured to do role searches?
-        if ((roleFormat == null) || (roleName == null))
+        if ((roleFormat == null) || (roleName == null)) {
             return list;
+        }
 
         // Set up parameters for an appropriate search
         String filter = roleFormat.format(new String[] { doRFC2254Encoding(dn), username, userRoleId });
         SearchControls controls = new SearchControls();
-        if (roleSubtree)
+        if (roleSubtree) {
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        else
+        } else {
             controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+        }
         controls.setReturningAttributes(new String[] {roleName});
 
         String base = null;
@@ -1983,16 +2017,18 @@ public class JNDIRealm extends RealmBase {
         NamingEnumeration<SearchResult> results = searchAsUser(context, user, base, filter, controls,
                 isRoleSearchAsUser());
 
-        if (results == null)
+        if (results == null) {
             return list;  // Should never happen, but just in case ...
+        }
 
         HashMap<String, String> groupMap = new HashMap<>();
         try {
             while (results.hasMore()) {
                 SearchResult result = results.next();
                 Attributes attrs = result.getAttributes();
-                if (attrs == null)
+                if (attrs == null) {
                     continue;
+                }
                 String dname = getDistinguishedName(context, roleBase, result);
                 String name = getAttributeValue(roleName, attrs);
                 if (name != null && dname != null) {
@@ -2000,8 +2036,9 @@ public class JNDIRealm extends RealmBase {
                 }
             }
         } catch (PartialResultException ex) {
-            if (!adCompat)
+            if (!adCompat) {
                 throw ex;
+            }
         } finally {
             results.close();
         }
@@ -2040,8 +2077,9 @@ public class JNDIRealm extends RealmBase {
                         while (results.hasMore()) {
                             SearchResult result = results.next();
                             Attributes attrs = result.getAttributes();
-                            if (attrs == null)
+                            if (attrs == null) {
                                 continue;
+                            }
                             String dname = getDistinguishedName(context, roleBase, result);
                             String name = getAttributeValue(roleName, attrs);
                             if (name != null && dname != null && !groupMap.keySet().contains(dname)) {
@@ -2055,8 +2093,9 @@ public class JNDIRealm extends RealmBase {
                             }
                          }
                     } catch (PartialResultException ex) {
-                        if (!adCompat)
+                        if (!adCompat) {
                             throw ex;
+                        }
                     } finally {
                         results.close();
                     }
@@ -2121,23 +2160,28 @@ public class JNDIRealm extends RealmBase {
     private String getAttributeValue(String attrId, Attributes attrs)
         throws NamingException {
 
-        if (containerLog.isTraceEnabled())
+        if (containerLog.isTraceEnabled()) {
             containerLog.trace("  retrieving attribute " + attrId);
+        }
 
-        if (attrId == null || attrs == null)
+        if (attrId == null || attrs == null) {
             return null;
+        }
 
         Attribute attr = attrs.get(attrId);
-        if (attr == null)
+        if (attr == null) {
             return null;
+        }
         Object value = attr.get();
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         String valueString = null;
-        if (value instanceof byte[])
+        if (value instanceof byte[]) {
             valueString = new String((byte[]) value);
-        else
+        } else {
             valueString = value.toString();
+        }
 
         return valueString;
     }
@@ -2157,15 +2201,19 @@ public class JNDIRealm extends RealmBase {
                                          ArrayList<String> values)
         throws NamingException{
 
-        if (containerLog.isTraceEnabled())
+        if (containerLog.isTraceEnabled()) {
             containerLog.trace("  retrieving values for attribute " + attrId);
-        if (attrId == null || attrs == null)
+        }
+        if (attrId == null || attrs == null) {
             return values;
-        if (values == null)
+        }
+        if (values == null) {
             values = new ArrayList<>();
+        }
         Attribute attr = attrs.get(attrId);
-        if (attr == null)
+        if (attr == null) {
             return values;
+        }
         NamingEnumeration<?> e = attr.getAll();
         try {
             while(e.hasMore()) {
@@ -2173,8 +2221,9 @@ public class JNDIRealm extends RealmBase {
                 values.add(value);
             }
         } catch (PartialResultException ex) {
-            if (!adCompat)
+            if (!adCompat) {
                 throw ex;
+            }
         } finally {
             e.close();
         }
@@ -2190,8 +2239,9 @@ public class JNDIRealm extends RealmBase {
     protected void close(DirContext context) {
 
         // Do nothing if there is no opened connection
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         // Close tls startResponse if used
         if (tls != null) {
@@ -2203,8 +2253,9 @@ public class JNDIRealm extends RealmBase {
         }
         // Close our opened connection
         try {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("Closing directory context");
+            }
             context.close();
         } catch (NamingException e) {
             containerLog.error(sm.getString("jndiRealm.close"), e);
@@ -2299,8 +2350,9 @@ public class JNDIRealm extends RealmBase {
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
-                if (context != null)
+                if (context != null) {
                     close(context);
+                }
 
                 // open a new directory context.
                 context = open();
@@ -2323,8 +2375,9 @@ public class JNDIRealm extends RealmBase {
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
             // Close the connection so that it gets reopened next time
-            if (context != null)
+            if (context != null) {
                 close(context);
+            }
 
             // Return "not authenticated" for this request
             return null;
@@ -2410,8 +2463,9 @@ public class JNDIRealm extends RealmBase {
     protected DirContext open() throws NamingException {
 
         // Do nothing if there is a directory server connection already open
-        if (context != null)
+        if (context != null) {
             return context;
+        }
 
         try {
 
@@ -2569,31 +2623,41 @@ public class JNDIRealm extends RealmBase {
         Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
-        if (containerLog.isDebugEnabled() && connectionAttempt == 0)
+        if (containerLog.isDebugEnabled() && connectionAttempt == 0) {
             containerLog.debug("Connecting to URL " + connectionURL);
-        else if (containerLog.isDebugEnabled() && connectionAttempt > 0)
+        } else if (containerLog.isDebugEnabled() && connectionAttempt > 0) {
             containerLog.debug("Connecting to URL " + alternateURL);
+        }
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
-        if (connectionName != null)
+        if (connectionName != null) {
             env.put(Context.SECURITY_PRINCIPAL, connectionName);
-        if (connectionPassword != null)
+        }
+        if (connectionPassword != null) {
             env.put(Context.SECURITY_CREDENTIALS, connectionPassword);
-        if (connectionURL != null && connectionAttempt == 0)
+        }
+        if (connectionURL != null && connectionAttempt == 0) {
             env.put(Context.PROVIDER_URL, connectionURL);
-        else if (alternateURL != null && connectionAttempt > 0)
+        } else if (alternateURL != null && connectionAttempt > 0) {
             env.put(Context.PROVIDER_URL, alternateURL);
-        if (authentication != null)
+        }
+        if (authentication != null) {
             env.put(Context.SECURITY_AUTHENTICATION, authentication);
-        if (protocol != null)
+        }
+        if (protocol != null) {
             env.put(Context.SECURITY_PROTOCOL, protocol);
-        if (referrals != null)
+        }
+        if (referrals != null) {
             env.put(Context.REFERRAL, referrals);
-        if (derefAliases != null)
+        }
+        if (derefAliases != null) {
             env.put(JNDIRealm.DEREF_ALIASES, derefAliases);
-        if (connectionTimeout != null)
+        }
+        if (connectionTimeout != null) {
             env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);
-        if (readTimeout != null)
+        }
+        if (readTimeout != null) {
             env.put("com.sun.jndi.ldap.read.timeout", readTimeout);
+        }
 
         return env;
 

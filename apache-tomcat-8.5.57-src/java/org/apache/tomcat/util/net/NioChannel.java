@@ -110,7 +110,9 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * @throws IOException If closing the secure channel fails.
      */
     public void close(boolean force) throws IOException {
-        if (isOpen() || force ) close();
+        if (isOpen() || force ) {
+            close();
+        }
     }
 
     /**
