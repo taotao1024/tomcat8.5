@@ -382,7 +382,7 @@ public final class Bootstrap {
             init();
         }
 
-        // 反射加载Catalina的Start()方法
+        // 反射加载Catalina.Start()方法
         Method method = catalinaDaemon.getClass().getMethod("start", (Class[]) null);
         method.invoke(catalinaDaemon, (Object[]) null);
     }
@@ -538,6 +538,7 @@ public final class Bootstrap {
                 args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
+                System.out.println("=================== 默认start分支 =================== ");
                 daemon.setAwait(true);
                 /**
                  * 加载守护线程,反射执行Catalina的Load()方法
@@ -552,7 +553,7 @@ public final class Bootstrap {
                  * 启动Tomcat,反射执行Catalina的start()方法
                  * BootStrap.start()-->Catalina.start()-->StandardServer.startInternal()-->
                  * StandardService.startInternal()--> engine.start()容器-->StandardHost-->
-                 *                                    ContainerBase-->HostConfig部署应用（三种部署方式）-->
+                 *                                    ContainerBase-->HostConfig 部署应用（三种部署方式）-->
                  *                                    StandardContext-->StandardWrapper
                  * StandardService.startInternal()--> executor.start()线程池
                  * StandardService.startInternal()--> connector.start()连接器-->ContainerBase.start() 启动所有子容器

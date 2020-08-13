@@ -5214,12 +5214,12 @@ public class StandardContext extends ContainerBase
             // Set up the context init params
             mergeParameters();
 
-            // Call ServletContainerInitializers
+            // Call ServletContainer Initializers
             for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
                     initializers.entrySet()) {
                 try {
-                    entry.getKey().onStartup(entry.getValue(),
-                            getServletContext());
+                    // 加载ApplicationContext
+                    entry.getKey().onStartup(entry.getValue(), getServletContext());
                 } catch (ServletException e) {
                     log.error(sm.getString("standardContext.sciFail"), e);
                     ok = false;

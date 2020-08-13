@@ -102,7 +102,7 @@ final class StandardWrapperValve
         // 每次增加都会有对性的StandardWrapper和Value与之对应
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         Servlet servlet = null;
-        // 获取父容器
+        // 获取父容器Context
         Context context = (Context) wrapper.getParent();
 
         // Check for the application being marked unavailable
@@ -113,11 +113,12 @@ final class StandardWrapperValve
         }
 
         // Check for the servlet being marked unavailable
-        // 检查标记为不可用的servlet
+        // 检查servlet是否存在
         if (!unavailable && wrapper.isUnavailable()) {
             container.getLogger().info(sm.getString("standardWrapper.isUnavailable",
                     wrapper.getName()));
             long available = wrapper.getAvailable();
+            // 设置 Response 头信息
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
                 response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
@@ -131,7 +132,6 @@ final class StandardWrapperValve
             unavailable = true;
         }
 
-        // Allocate a servlet instance to process this request
         // 分配一个servlet实例来处理此请求
         // Servlet默认是在第一次请求的时候 实例化 类似于延迟加载
         try {
@@ -193,8 +193,7 @@ final class StandardWrapperValve
                             request.getAsyncContextInternal().doInternalDispatch();
                         } else {
                             // 执行过滤链
-                            filterChain.doFilter(request.getRequest(),
-                                    response.getResponse());
+                            filterChain.doFilter(request.getRequest(), response.getResponse());
                         }
                     } finally {
                         String log = SystemLogHandler.stopCapture();

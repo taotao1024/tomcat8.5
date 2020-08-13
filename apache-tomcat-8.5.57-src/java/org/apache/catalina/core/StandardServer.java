@@ -471,8 +471,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     // Read a set of characters from the socket
                     int expected = 1024; // Cut off to avoid DoS attack
                     while (expected < shutdown.length()) {
-                        if (random == null)
+                        if (random == null) {
                             random = new Random();
+                        }
                         expected += (random.nextInt() % 1024);
                     }
                     while (expected > 0) {
@@ -506,8 +507,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 if (match) {
                     log.info(sm.getString("standardServer.shutdownViaPort"));
                     break;
-                } else
+                } else {
                     log.warn(sm.getString("standardServer.invalidShutdownCommand", command.toString()));
+                }
             }
         } finally {
             ServerSocket serverSocket = awaitSocket;
@@ -584,8 +586,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     break;
                 }
             }
-            if (j < 0)
+            if (j < 0) {
                 return;
+            }
             try {
                 services[j].stop();
             } catch (LifecycleException e) {
@@ -594,8 +597,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             int k = 0;
             Service results[] = new Service[services.length - 1];
             for (int i = 0; i < services.length; i++) {
-                if (i != j)
+                if (i != j) {
                     results[k++] = services[i];
+                }
             }
             services = results;
 
@@ -869,8 +873,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (catalina != null) {
             return catalina.getParentClassLoader();
         }

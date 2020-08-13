@@ -25,6 +25,8 @@ import org.apache.catalina.Host;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -37,6 +39,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 final class StandardEngineValve extends ValveBase {
+    private static final Log log = LogFactory.getLog(StandardEngineValve.class);
+
 
     //------------------------------------------------------ Constructor
     public StandardEngineValve() {
@@ -69,13 +73,12 @@ final class StandardEngineValve extends ValveBase {
     public final void invoke(Request request, Response response)
             throws IOException, ServletException {
 
-        // 选择用于此请求的主机
+        // 获取 StandardHostValve.invoke()
         Host host = request.getHost();
+        log.info("Host info " + host);
         if (host == null) {
             response.sendError
-                    (HttpServletResponse.SC_BAD_REQUEST,
-                            sm.getString("standardEngine.noHost",
-                                    request.getServerName()));
+                    (HttpServletResponse.SC_BAD_REQUEST, sm.getString("standardEngine.noHost", request.getServerName()));
             return;
         }
         // 异步处理
@@ -85,8 +88,8 @@ final class StandardEngineValve extends ValveBase {
 
         // 请求此主机处理此请求
         // StandardHost.getPipeline()-->StandardPipeline.getFirst()-->Valve.invoke(request, response);
-        // Engine-->Host-->Context-->Wrapper
-        // StandardWrapperValve.invoke() 最终的处理
+        // StandardEngineValve-->StandardHostValve-->StandardContextValve-->StandardWrapperValve
+        // StandardWrapperValve.invoke() 是最终的处理
         host.getPipeline().getFirst().invoke(request, response);
 
     }

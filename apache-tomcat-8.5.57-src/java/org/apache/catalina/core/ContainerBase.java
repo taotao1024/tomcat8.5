@@ -943,15 +943,17 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // 线程启动的返回值  Future同步框架  用来获取线程信息
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
-            // 启停线程池
+            // 启停线程池 将子节点 提交给线程池去处理 私有静态内部类
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
+        // 阻塞到所有的子组件都启动
         MultiThrowable multiThrowable = null;
 
         // ----------- 子容器初始化、启动 start -----------
         for (Future<Void> result : results) {
             try {
+                // 执行这一步后 子容器会被启动 细节待处理
                 result.get();
             } catch (Throwable e) {
                 log.error(sm.getString("containerBase.threadedStartFailed"), e);
@@ -984,7 +986,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
          */
         setState(LifecycleState.STARTING);
 
-        // 启动线程
+        // 启动生命收起线程
         threadStart();
     }
 

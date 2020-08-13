@@ -463,7 +463,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             }
 
             // ---------- 重点 ----------
-            System.out.println("NioEndpoint Channel : " + channel);
+            System.out.println("NioEndpoint Channel<重点关照> : " + channel);
             getPoller0().register(channel);
             // ---------- 重点 ----------
 
@@ -549,6 +549,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     try {
                         // Accept the next incoming connection from the server socket
                         // 接受来自服务器套接字的下一个传入连接
+                        // java.nio.channels 与Tomcat无关
                         socket = serverSock.accept();
                         System.out.println("Acceptor接收器 socket : " + socket);
                     } catch (IOException ioe) {
@@ -832,7 +833,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             ka.setReadTimeout(getConnectionTimeout());
             ka.setWriteTimeout(getConnectionTimeout());
             PollerEvent r = eventCache.pop();// 轮训器事件
-            // 生成getPoller(),Socket加入到EvenQueue
+            // 生成 getPoller() Socket 加入到 EvenQueue 事件队列
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if (r == null) {
                 r = new PollerEvent(socket, ka, OP_REGISTER);
@@ -967,6 +968,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     } else {
                         // 移除
                         iterator.remove();
+                        // 处理Key
                         processKey(sk, attachment);
                     }
                 }//while
@@ -989,8 +991,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         } else {
                             unreg(sk, attachment, sk.readyOps());
                             boolean closeSocket = false;
-                            // Read goes before write
-                            // 读在写之前
+                            // 读在写之前 Socket
+                            // 读事件
                             if (sk.isReadable()) {
                                 // 预处理
                                 if (!processSocket(attachment, SocketEvent.OPEN_READ, true)) {

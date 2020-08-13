@@ -422,7 +422,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // 设置状态为starting
         setState(LifecycleState.STARTING);
 
-        // 启动Engine
+        // 启动Engine 及其所有 子容器
         if (engine != null) {
             synchronized (engine) {
                 engine.start();

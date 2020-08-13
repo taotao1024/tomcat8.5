@@ -256,7 +256,7 @@ public class OutputBuffer extends Writer {
         }
 
         if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)
-                && !coyoteResponse.getRequest().method().equals("HEAD")) {
+                && !coyoteResponse.getRequest().method().equals("HEAD")) {// coyoteResponse
             // If this didn't cause a commit of the response, the final content
             // length can be calculated. Only do this if this is not a HEAD
             // request since in that case no body should have been written and
@@ -300,8 +300,6 @@ public class OutputBuffer extends Writer {
 
 
     /**
-     * Flush bytes or chars contained in the buffer.
-     * <p>
      * 刷新缓冲区中包含的字节或字符。
      *
      * @param realFlush <code>true</code> if this should also cause a real network flush

@@ -74,7 +74,9 @@ public class StandardWrapper extends ContainerBase
         implements ServletConfig, Wrapper, NotificationEmitter {
 
     private final Log log = LogFactory.getLog(StandardWrapper.class); // must not be static
-
+    /**
+     * 默认服务方法：get、head、post
+     */
     protected static final String[] DEFAULT_SERVLET_METHODS = new String[]{
             "GET", "HEAD", "POST"};
 
@@ -138,6 +140,15 @@ public class StandardWrapper extends ContainerBase
     /**
      * The load-on-startup order value (negative value means load on
      * first call) for this servlet.
+     * <p>
+     * <servlet>
+     * <servlet-name> xxxJsp </servlet-name>
+     * <servlet-class> com.lsy.xxxJsp </servlet-class>
+     * <load-on-startup>-1</load-on-startup>
+     * </servlet>
+     * <p>
+     * >=0 即使加载 加载优先级
+     * <0  第一次访问时加载 默认为-1
      */
     protected int loadOnStartup = -1;
 
@@ -308,10 +319,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void setAvailable(long available) {
         long oldAvailable = this.available;
-        if (available > System.currentTimeMillis())
+        if (available > System.currentTimeMillis()) {
             this.available = available;
-        else
+        } else {
             this.available = 0L;
+        }
         support.firePropertyChange("available", Long.valueOf(oldAvailable),
                 Long.valueOf(this.available));
     }
@@ -424,9 +436,10 @@ public class StandardWrapper extends ContainerBase
     public void setParent(Container container) {
 
         if ((container != null) &&
-                !(container instanceof Context))
+                !(container instanceof Context)) {
             throw new IllegalArgumentException
                     (sm.getString("standardWrapper.notContext"));
+        }
         if (container instanceof StandardContext) {
             swallowOutput = ((StandardContext) container).getSwallowOutput();
             unloadDelay = ((StandardContext) container).getUnloadDelay();
@@ -528,15 +541,16 @@ public class StandardWrapper extends ContainerBase
     @Override
     public boolean isUnavailable() {
 
-        if (!isEnabled())
+        if (!isEnabled()) {
             return true;
-        else if (available == 0L)
+        } else if (available == 0L) {
             return false;
-        else if (available <= System.currentTimeMillis()) {
+        } else if (available <= System.currentTimeMillis()) {
             available = 0L;
             return false;
-        } else
+        } else {
             return true;
+        }
 
     }
 
@@ -616,8 +630,9 @@ public class StandardWrapper extends ContainerBase
     public void backgroundProcess() {
         super.backgroundProcess();
 
-        if (!getState().isAvailable())
+        if (!getState().isAvailable()) {
             return;
+        }
 
         if (getServlet() instanceof PeriodicEventListener) {
             ((PeriodicEventListener) getServlet()).periodicEvent();
@@ -639,8 +654,9 @@ public class StandardWrapper extends ContainerBase
         do {
             loops++;
             rootCauseCheck = rootCause.getCause();
-            if (rootCauseCheck != null)
+            if (rootCauseCheck != null) {
                 rootCause = rootCauseCheck;
+            }
         } while (rootCauseCheck != null && (loops < 20));
         return rootCause;
     }
@@ -695,8 +711,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if (parent.getState().equals(LifecycleState.STARTED))
+        if (parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(ADD_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -746,9 +763,10 @@ public class StandardWrapper extends ContainerBase
         boolean newInstance = false;
 
         // If not SingleThreadedModel, return the same instance every time
+        // 处理非单例模式
         if (!singleThreadModel) {
             // Load and initialize our instance if necessary
-            // DCL
+            // DCL 双锁校验 保证线程安全
             if (instance == null || !instanceInitialized) {
                 synchronized (this) {
                     if (instance == null) {
@@ -764,7 +782,7 @@ public class StandardWrapper extends ContainerBase
                             if (!singleThreadModel) {
                                 // For non-STM, increment here to prevent a race
                                 // condition with unload. Bug 43683, test case
-                                // #3
+                                // #3 CAS+1
                                 countAllocated.incrementAndGet();
                             }
                         } catch (ServletException e) {
@@ -780,6 +798,7 @@ public class StandardWrapper extends ContainerBase
                 }
             }
 
+            // 处理单例模式
             if (singleThreadModel) {
                 if (newInstance) {
                     // Have to do this outside of the sync above to prevent a
@@ -960,6 +979,10 @@ public class StandardWrapper extends ContainerBase
 
     }
 
+    /**
+     * 手动添加：统计Wrapper的数量
+     */
+    private static int countWrapper = 0;
 
     /**
      * Load and initialize an instance of this servlet, if there is not already
@@ -980,12 +1003,17 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public synchronized void load() throws ServletException {
-        instance = loadServlet();
 
+        // 加载Servlet
+        instance = loadServlet();
+        System.out.printf("================  Wrapper %s 加载成功 ================ \n", ++countWrapper);
+
+        // 如果没有初始化Servlet，先初始化。
         if (!instanceInitialized) {
             initServlet(instance);
         }
 
+        // JspServlet
         if (isJspServlet) {
             StringBuilder oname = new StringBuilder(getDomain());
 
@@ -1005,6 +1033,7 @@ public class StandardWrapper extends ContainerBase
                 log.warn("Error registering JSP monitoring with jmx " + instance);
             }
         }
+
     }
 
 
@@ -1020,8 +1049,9 @@ public class StandardWrapper extends ContainerBase
     public synchronized Servlet loadServlet() throws ServletException {
 
         // Nothing to do if we already have an instance or an instance pool
-        if (!singleThreadModel && (instance != null))
+        if (!singleThreadModel && (instance != null)) {
             return instance;
+        }
 
         PrintStream out = System.out;
         if (swallowOutput) {
@@ -1062,7 +1092,7 @@ public class StandardWrapper extends ContainerBase
                 throw new ServletException
                         (sm.getString("standardWrapper.instantiate", servletClass), e);
             }
-
+            // 表单文件控件实例化
             if (multipartConfigElement == null) {
                 MultipartConfig annotation =
                         servlet.getClass().getAnnotation(MultipartConfig.class);
@@ -1123,7 +1153,9 @@ public class StandardWrapper extends ContainerBase
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
 
-        if (instanceInitialized && !singleThreadModel) return;
+        if (instanceInitialized && !singleThreadModel) {
+            return;
+        }
 
         // Call the initialization method of this servlet
         try {
@@ -1197,8 +1229,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if (parent.getState().equals(LifecycleState.STARTED))
+        if (parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -1232,14 +1265,15 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void unavailable(UnavailableException unavailable) {
         getServletContext().log(sm.getString("standardWrapper.unavailable", getName()));
-        if (unavailable == null)
+        if (unavailable == null) {
             setAvailable(Long.MAX_VALUE);
-        else if (unavailable.isPermanent())
+        } else if (unavailable.isPermanent()) {
             setAvailable(Long.MAX_VALUE);
-        else {
+        } else {
             int unavailableSeconds = unavailable.getUnavailableSeconds();
-            if (unavailableSeconds <= 0)
+            if (unavailableSeconds <= 0) {
                 unavailableSeconds = 60;        // Arbitrary default
+            }
             setAvailable(System.currentTimeMillis() +
                     (unavailableSeconds * 1000L));
         }
@@ -1261,8 +1295,9 @@ public class StandardWrapper extends ContainerBase
     public synchronized void unload() throws ServletException {
 
         // Nothing to do if we have never loaded the instance
-        if (!singleThreadModel && (instance == null))
+        if (!singleThreadModel && (instance == null)) {
             return;
+        }
         unloading = true;
 
         // Loaf a while if the current instance is allocated
@@ -1423,12 +1458,13 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public ServletContext getServletContext() {
-        if (parent == null)
+        if (parent == null) {
             return null;
-        else if (!(parent instanceof Context))
+        } else if (!(parent instanceof Context)) {
             return null;
-        else
+        } else {
             return ((Context) parent).getServletContext();
+        }
     }
 
 
@@ -1570,7 +1606,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Start this component and implement the requirements
+     * 启动这个组件 and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @throws LifecycleException if this component detects a fatal error
@@ -1587,8 +1623,9 @@ public class StandardWrapper extends ContainerBase
             broadcaster.sendNotification(notification);
         }
 
-        // Start up this component
+        // 父类启动wrapper组件
         super.startInternal();
+        //System.out.printf("================  Wrapper %s 启动该成功 ================ \n", countWrapper);
 
         setAvailable(0L);
 
