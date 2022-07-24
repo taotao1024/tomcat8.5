@@ -1889,7 +1889,9 @@ public class HostConfig implements LifecycleListener {
             config.deployDescriptor(cn, descriptor);
         }
     }
-
+    /**
+     * 内部类 部署
+     */
     private static class DeployWar implements Runnable {
 
         private HostConfig config;
@@ -1909,7 +1911,7 @@ public class HostConfig implements LifecycleListener {
     }
 
     /**
-     * 内部类
+     * 内部类 部署
      */
     private static class DeployDirectory implements Runnable {
 

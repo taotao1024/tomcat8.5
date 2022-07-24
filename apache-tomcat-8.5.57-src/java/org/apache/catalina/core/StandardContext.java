@@ -5079,18 +5079,12 @@ public class StandardContext extends ContainerBase
 
                 // since the loader just started, the webapp classloader is now  created.
                 // 设置类加载器属性
-                setClassLoaderProperty("clearReferencesRmiTargets",
-                        getClearReferencesRmiTargets());
-                setClassLoaderProperty("clearReferencesStopThreads",
-                        getClearReferencesStopThreads());
-                setClassLoaderProperty("clearReferencesStopTimerThreads",
-                        getClearReferencesStopTimerThreads());
-                setClassLoaderProperty("clearReferencesHttpClientKeepAliveThread",
-                        getClearReferencesHttpClientKeepAliveThread());
-                setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
-                        getClearReferencesObjectStreamClassCaches());
-                setClassLoaderProperty("clearReferencesThreadLocals",
-                        getClearReferencesThreadLocals());
+                setClassLoaderProperty("clearReferencesRmiTargets", getClearReferencesRmiTargets());
+                setClassLoaderProperty("clearReferencesStopThreads", getClearReferencesStopThreads());
+                setClassLoaderProperty("clearReferencesStopTimerThreads", getClearReferencesStopTimerThreads());
+                setClassLoaderProperty("clearReferencesHttpClientKeepAliveThread", getClearReferencesHttpClientKeepAliveThread());
+                setClassLoaderProperty("clearReferencesObjectStreamClassCaches", getClearReferencesObjectStreamClassCaches());
+                setClassLoaderProperty("clearReferencesThreadLocals", getClearReferencesThreadLocals());
 
                 // By calling unbindThread and bindThread in a row, we setup the
                 // current Thread CCL to be the webapp classloader
@@ -5185,6 +5179,7 @@ public class StandardContext extends ContainerBase
             }
 
             // We put the resources into the servlet context
+            // 我们将资源放入 servlet 上下文中
             if (ok) {
                 getServletContext().setAttribute
                         (Globals.RESOURCES_ATTR, getResources());

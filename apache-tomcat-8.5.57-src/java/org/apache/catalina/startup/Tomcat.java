@@ -1123,9 +1123,13 @@ public class Tomcat {
     /**
      * Fix startup sequence - required if you don't use web.xml.
      *
+     * 修复启动顺序 - 如果您不使用 web.xml，则需要
+     *
      * <p>
      * The start() method in context will set 'configured' to false - and
      * expects a listener to set it back to true.
+     *
+     * 上下文中的 start() 方法会将 'configured' 设置为 false - 并期望侦听器将其设置回 true。
      */
     public static class FixContextListener implements LifecycleListener {
 
@@ -1156,6 +1160,8 @@ public class Tomcat {
      * Fix reload - required if reloading and using programmatic configuration.
      * When a context is reloaded, any programmatic configuration is lost. This
      * listener sets the equivalent of conf/web.xml when the context starts.
+     *
+     * 修复重新加载 - 如果重新加载和使用编程配置，则需要。重新加载上下文时，任何编程配置都将丢失。此侦听器在上下文启动时设置 conf/web.xml 的等效项。
      */
     public static class DefaultWebXmlListener implements LifecycleListener {
         @Override
@@ -1171,6 +1177,8 @@ public class Tomcat {
      * Helper class for wrapping existing servlets. This disables servlet
      * lifecycle and normal reloading, but also reduces overhead and provide
      * more direct control over the servlet.
+     *
+     * 用于包装现有 servlet 的助手类。这会禁用 servlet 生命周期和正常重新加载，但也减少了开销并提供对 servlet 的更直接控制。
      */
     public static class ExistingStandardWrapper extends StandardWrapper {
         private final Servlet existing;

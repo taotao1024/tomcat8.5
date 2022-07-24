@@ -2095,11 +2095,11 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
-
+    // web.xml
     protected void processAnnotationsStream(InputStream is, WebXml fragment,
                                             boolean handlesTypesOnly, Map<String, JavaClassCacheEntry> javaClassCache)
             throws ClassFormatException, IOException {
-        // 解析XML文件
+        // 类解析器 解析servlet filter listener
         ClassParser parser = new ClassParser(is);
         JavaClass clazz = parser.parse();
         checkHandlesTypes(clazz, javaClassCache);

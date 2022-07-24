@@ -141,7 +141,7 @@ public final class Bootstrap {
     private Object catalinaDaemon = null;
 
     /**
-     * 类加载器
+     * 类加载器  URLClassLoader
      */
     ClassLoader commonLoader = null;
     ClassLoader catalinaLoader = null;
