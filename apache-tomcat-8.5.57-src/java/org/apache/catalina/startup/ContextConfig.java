@@ -782,6 +782,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         webConfig();
+        // 原因是我们直接启动org.apache.catalina.startup.Bootstrap的时候没有加载org.apache.jasper.servlet.JasperInitializer，
+        // 从而无法编译JSP 这里需要手动将JSP解析器初始化
         // 修改源码  解决乱码问题、500问题
         context.addServletContainerInitializer(new JasperInitializer(), null);
 

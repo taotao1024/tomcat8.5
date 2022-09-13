@@ -50,4 +50,8 @@ webapps/docs/jdbc-pool.xml
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/apache-tomcat-8.iml
+apache-tomcat-8.5.57-src/Tomcat8.5.57.iml
 /.idea/
+/catalina-home/work
+/catalina-home/logs

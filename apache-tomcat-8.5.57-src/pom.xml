@@ -14,7 +14,7 @@
         <!--指定源目录-->
         <finalName>Tomcat8.5</finalName>
         <sourceDirectory>java</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
+        <!--<testSourceDirectory>test</testSourceDirectory>-->
 
         <resources>
             <resource>
@@ -47,6 +47,7 @@
     <!--Tomcat是java开发的，封装了很多功能，它需要依赖一些基础的jar包-->
     <dependencies>
         <!---easymock辅助单元测试-->
+        <!-- https://mvnrepository.com/artifact/org.easymock/easymock -->
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
@@ -61,18 +62,21 @@
             <scope>test</scope>
         </dependency>
         <!--ant管理工具-->
+        <!-- https://mvnrepository.com/artifact/ant/ant -->
         <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.7.0</version>
         </dependency>
         <!--解析webservice的wsdl文件工具-->
+        <!-- https://mvnrepository.com/artifact/wsdl4j/wsdl4j -->
         <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
             <version>1.6.2</version>
         </dependency>
         <!--远程过程调用工具包-->
+        <!-- https://mvnrepository.com/artifact/javax.xml/jaxrpc -->
         <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc</artifactId>
