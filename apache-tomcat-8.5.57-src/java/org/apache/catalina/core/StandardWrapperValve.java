@@ -93,6 +93,7 @@ final class StandardWrapperValve
             throws IOException, ServletException {
 
         // Initialize local variables we may need
+        // 初始化我们可能需要的局部变量
         boolean unavailable = false;
         Throwable throwable = null;
         // This should be a Request attribute...
@@ -115,19 +116,16 @@ final class StandardWrapperValve
         // Check for the servlet being marked unavailable
         // 检查servlet是否存在
         if (!unavailable && wrapper.isUnavailable()) {
-            container.getLogger().info(sm.getString("standardWrapper.isUnavailable",
-                    wrapper.getName()));
+            container.getLogger().info(sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             long available = wrapper.getAvailable();
             // 设置 Response 头信息
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                        sm.getString("standardWrapper.isUnavailable",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable",
+                        wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        sm.getString("standardWrapper.notFound",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound",
+                        wrapper.getName()));
             }
             unavailable = true;
         }
@@ -139,29 +137,21 @@ final class StandardWrapperValve
                 servlet = wrapper.allocate();
             }
         } catch (UnavailableException e) {
-            container.getLogger().error(
-                    sm.getString("standardWrapper.allocateException",
-                            wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                        sm.getString("standardWrapper.isUnavailable",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        sm.getString("standardWrapper.notFound",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound", wrapper.getName()));
             }
         } catch (ServletException e) {
-            container.getLogger().error(sm.getString("standardWrapper.allocateException",
-                    wrapper.getName()), StandardWrapper.getRootCause(e));
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), StandardWrapper.getRootCause(e));
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.allocateException",
-                    wrapper.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
             throwable = e;
             exception(request, response, e);
             servlet = null;
@@ -174,12 +164,10 @@ final class StandardWrapperValve
             dispatcherType = DispatcherType.ASYNC;
         }
         request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, dispatcherType);
-        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
-                requestPathMB);
+        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, requestPathMB);
         // Create the filter chain for this request
         // 创建过滤链
-        ApplicationFilterChain filterChain =
-                ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
+        ApplicationFilterChain filterChain = ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method
@@ -207,61 +195,45 @@ final class StandardWrapperValve
                     if (request.isAsyncDispatching()) {
                         request.getAsyncContextInternal().doInternalDispatch();
                     } else {
-                        filterChain.doFilter
-                                (request.getRequest(), response.getResponse());
+                        filterChain.doFilter(request.getRequest(), response.getResponse());
                     }
                 }
 
             }
         } catch (ClientAbortException | CloseNowException e) {
             if (container.getLogger().isDebugEnabled()) {
-                container.getLogger().debug(sm.getString(
-                        "standardWrapper.serviceException", wrapper.getName(),
-                        context.getName()), e);
+                container.getLogger().debug(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             }
             throwable = e;
             exception(request, response, e);
         } catch (IOException e) {
-            container.getLogger().error(sm.getString(
-                    "standardWrapper.serviceException", wrapper.getName(),
-                    context.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } catch (UnavailableException e) {
-            container.getLogger().error(sm.getString(
-                    "standardWrapper.serviceException", wrapper.getName(),
-                    context.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             //            throwable = e;
             //            exception(request, response, e);
             wrapper.unavailable(e);
             long available = wrapper.getAvailable();
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
                 response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                        sm.getString("standardWrapper.isUnavailable",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, sm.getString("standardWrapper.isUnavailable", wrapper.getName()));
             } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        sm.getString("standardWrapper.notFound",
-                                wrapper.getName()));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, sm.getString("standardWrapper.notFound", wrapper.getName()));
             }
             // Do not save exception in 'throwable', because we
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
             Throwable rootCause = StandardWrapper.getRootCause(e);
             if (!(rootCause instanceof ClientAbortException)) {
-                container.getLogger().error(sm.getString(
-                        "standardWrapper.serviceExceptionRoot",
-                        wrapper.getName(), context.getName(), e.getMessage()),
-                        rootCause);
+                container.getLogger().error(sm.getString("standardWrapper.serviceExceptionRoot", wrapper.getName(), context.getName(), e.getMessage()), rootCause);
             }
             throwable = e;
             exception(request, response, e);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString(
-                    "standardWrapper.serviceException", wrapper.getName(),
-                    context.getName()), e);
+            container.getLogger().error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
             throwable = e;
             exception(request, response, e);
         } finally {
@@ -279,8 +251,7 @@ final class StandardWrapperValve
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                container.getLogger().error(sm.getString("standardWrapper.deallocateException",
-                        wrapper.getName()), e);
+                container.getLogger().error(sm.getString("standardWrapper.deallocateException", wrapper.getName()), e);
                 if (throwable == null) {
                     throwable = e;
                     exception(request, response, e);
@@ -291,14 +262,12 @@ final class StandardWrapperValve
             // unload it and release this instance
             try {
                 // 卸载Wrapper
-                if ((servlet != null) &&
-                        (wrapper.getAvailable() == Long.MAX_VALUE)) {
+                if ((servlet != null) && (wrapper.getAvailable() == Long.MAX_VALUE)) {
                     wrapper.unload();
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                container.getLogger().error(sm.getString("standardWrapper.unloadException",
-                        wrapper.getName()), e);
+                container.getLogger().error(sm.getString("standardWrapper.unloadException", wrapper.getName()), e);
                 if (throwable == null) {
                     exception(request, response, e);
                 }

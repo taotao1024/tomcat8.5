@@ -77,8 +77,7 @@ final class StandardEngineValve extends ValveBase {
         Host host = request.getHost();
         log.info("Host info " + host);
         if (host == null) {
-            response.sendError
-                    (HttpServletResponse.SC_BAD_REQUEST, sm.getString("standardEngine.noHost", request.getServerName()));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, sm.getString("standardEngine.noHost", request.getServerName()));
             return;
         }
         // 异步处理

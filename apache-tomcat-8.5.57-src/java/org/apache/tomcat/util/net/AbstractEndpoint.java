@@ -1201,7 +1201,7 @@ public abstract class AbstractEndpoint<S> {
                 return false;
             }
             // 获取 || 创建一个 Socket 处理器
-            // 默认是 Http11NioProtocol
+            // 默认是 Http11NioProtocol SocketProcessorBase相当于一个Worker
             SocketProcessorBase<S> sc = processorCache.pop();
             if (sc == null) {
                 // 如果获取不到就创建

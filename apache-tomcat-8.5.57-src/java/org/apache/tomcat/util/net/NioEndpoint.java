@@ -180,6 +180,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
     /**
      * The socket poller.
+     * 套接字轮询器
      */
     private Poller[] pollers = null;
     private AtomicInteger pollerRotater = new AtomicInteger(0);
@@ -501,7 +502,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      * 侦听传入TCP/IP连接的后台线程、把它们交给适当的处理器。<p>
      * 接受请求<p>
      * <p>
-     * 入口方法：User --> http://localhost:8080/ --> NioEndPoint.Acceptor.accept()
+     * 入口方法：User --> http://localhost:8080/
+     * -->NioEndPoint.Acceptor.accept()
      * -->NioEndPoint.Acceptor.setSocketOptions()
      * -->NIOEndPoint.getPollor()-->NioEndPoint.Pollor.register()
      * -->NIOEndPoint.getPollor()-->NioEndPoint.Pollor.processKey()
@@ -645,6 +647,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     // ----------------------------------------------------- Poller Inner Classes
 
     /**
+     * PollerEvent，用于轮询事件的可缓存对象，以避免 GC
      * PollerEvent, cacheable object for poller events to avoid GC
      */
     public static class PollerEvent implements Runnable {
@@ -686,7 +689,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         // processed. Count down the connections at this point
                         // since it won't have been counted down when the socket
                         // closed.
-                        //                                 减法器
+                        // 键被取消（例如由于套接字关闭）并在处理时从选择器中删除。此时倒计时连接，因为当套接字关闭时它不会倒计时。
+                        //                                 减法器(线程持中链接数量-1)
                         socket.socketWrapper.getEndpoint().countDownConnection();
                         ((NioSocketWrapper) socket.socketWrapper).closed = true;
                     } else {
@@ -949,15 +953,16 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     log.error("", x);
                     continue;
                 }
-                //either we timed out or we woke up, process events first
+                // either we timed out or we woke up, process events first
+                // 要么我们超时，要么我们醒来，首先处理事件
                 if (keyCount == 0) {
                     hasEvents = (hasEvents | events());
                 }
 
                 Iterator<SelectionKey> iterator =
                         keyCount > 0 ? selector.selectedKeys().iterator() : null;
-                // Walk through the collection of ready keys and dispatch
-                // any active event.
+                // Walk through the collection of ready keys and dispatch any active event.
+                // 遍历就绪键的集合并调度任何活动事件。
                 while (iterator != null && iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
                     NioSocketWrapper attachment = (NioSocketWrapper) sk.attachment();
@@ -1802,6 +1807,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 if (handshake == 0) {
                     SocketState state = SocketState.OPEN;
                     // Process the request from this socket
+                    // 处理来自这个套接字的请求
                     if (event == null) {
                         state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
                     } else {

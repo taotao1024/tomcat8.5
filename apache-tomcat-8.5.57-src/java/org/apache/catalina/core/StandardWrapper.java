@@ -820,10 +820,11 @@ public class StandardWrapper extends ContainerBase
                 return instance;
             }
         }
-
+        // servlet 的分配
         synchronized (instancePool) {
             while (countAllocated.get() >= nInstances) {
                 // Allocate a new instance if possible, or else wait
+                // 如果可能，分配一个新实例，否则等待
                 if (nInstances < maxInstances) {
                     try {
                         instancePool.push(loadServlet());
@@ -1064,8 +1065,7 @@ public class StandardWrapper extends ContainerBase
             // Complain if no servlet class has been specified
             if (servletClass == null) {
                 unavailable(null);
-                throw new ServletException
-                        (sm.getString("standardWrapper.notClass", getName()));
+                throw new ServletException(sm.getString("standardWrapper.notClass", getName()));
             }
 
             // 通用管理器：Servlet、Filter、Listener
@@ -1075,8 +1075,7 @@ public class StandardWrapper extends ContainerBase
             } catch (ClassCastException e) {
                 unavailable(null);
                 // Restore the context ClassLoader
-                throw new ServletException
-                        (sm.getString("standardWrapper.notServlet", servletClass), e);
+                throw new ServletException(sm.getString("standardWrapper.notServlet", servletClass), e);
             } catch (Throwable e) {
                 e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
@@ -1089,16 +1088,13 @@ public class StandardWrapper extends ContainerBase
                 }
 
                 // Restore the context ClassLoader
-                throw new ServletException
-                        (sm.getString("standardWrapper.instantiate", servletClass), e);
+                throw new ServletException(sm.getString("standardWrapper.instantiate", servletClass), e);
             }
             // 表单文件控件实例化
             if (multipartConfigElement == null) {
-                MultipartConfig annotation =
-                        servlet.getClass().getAnnotation(MultipartConfig.class);
+                MultipartConfig annotation = servlet.getClass().getAnnotation(MultipartConfig.class);
                 if (annotation != null) {
-                    multipartConfigElement =
-                            new MultipartConfigElement(annotation);
+                    multipartConfigElement = new MultipartConfigElement(annotation);
                 }
             }
 
@@ -1119,7 +1115,7 @@ public class StandardWrapper extends ContainerBase
                 }
                 singleThreadModel = true;
             }
-
+            // 调用 init()
             initServlet(servlet);
 
             fireContainerEvent("load", this);
@@ -1163,10 +1159,7 @@ public class StandardWrapper extends ContainerBase
                 boolean success = false;
                 try {
                     Object[] args = new Object[]{facade};
-                    SecurityUtil.doAsPrivilege("init",
-                            servlet,
-                            classType,
-                            args);
+                    SecurityUtil.doAsPrivilege("init", servlet, classType, args);
                     success = true;
                 } finally {
                     if (!success) {
