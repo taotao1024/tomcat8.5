@@ -792,8 +792,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractConnectionHandler.process",
-                        wrapper.getSocket(), status));
+                getLog().debug(sm.getString("abstractConnectionHandler.process", wrapper.getSocket(), status));
             }
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
@@ -884,9 +883,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         getLog().debug(sm.getString("abstractConnectionHandler.processorCreate", processor));
                     }
                 }
-
-                processor.setSslSupport(
-                        wrapper.getSslSupport(getProtocol().getClientCertProvider()));
+                // SSL 是否支持
+                processor.setSslSupport(wrapper.getSslSupport(getProtocol().getClientCertProvider()));
 
                 // Associate the processor with the connection
                 connections.put(socket, processor);

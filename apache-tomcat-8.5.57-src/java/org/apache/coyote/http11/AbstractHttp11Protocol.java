@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
@@ -1115,6 +1117,21 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setTrustManagerClassName(trustManagerClassName);
     }
 
+    //*********************************************************************
+    //***************************GMSSL 修改开始******************************
+    //*********************************************************************
+    public void setKeyManager(KeyManager[] km) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setKeyManager(km);
+    }
+
+    public void setTrustManager(TrustManager[] tm) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTrustManager(tm);
+    }
+    //*********************************************************************
+    //***************************GMSSL 修改结束******************************
+    //*********************************************************************
 
     // ------------------------------------------------------------- Common code
 

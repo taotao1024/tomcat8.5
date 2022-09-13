@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.ObjectName;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
@@ -31,6 +33,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * SSL 主机配置证书
+ */
 public class SSLHostConfigCertificate implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,10 +45,34 @@ public class SSLHostConfigCertificate implements Serializable {
 
     public static final Type DEFAULT_TYPE = Type.UNDEFINED;
 
-    static final String DEFAULT_KEYSTORE_PROVIDER =
-            System.getProperty("javax.net.ssl.keyStoreProvider");
-    static final String DEFAULT_KEYSTORE_TYPE =
-            System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+    static final String DEFAULT_KEYSTORE_PROVIDER = System.getProperty("javax.net.ssl.keyStoreProvider");
+    static final String DEFAULT_KEYSTORE_TYPE = System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+
+    //*********************************************************************
+    //***************************GMSSL 修改开始******************************
+    //*********************************************************************
+    private KeyManager[] keyManager = null;
+
+    private TrustManager[] trustManager = null;
+
+    public void setKeyManager(KeyManager[] keyManager) {
+        this.keyManager = keyManager;
+    }
+
+    public KeyManager[] getKeyManager() {
+        return keyManager;
+    }
+
+    public void setTrustManager(TrustManager[] trustManager) {
+        this.trustManager = trustManager;
+    }
+
+    public TrustManager[] getTrustManager() {
+        return trustManager;
+    }
+    //*********************************************************************
+    //***************************GMSSL 修改结束******************************
+    //*********************************************************************
 
     // Internal
     private ObjectName oname;

@@ -42,6 +42,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a secure socket channel
+ * 安全套接字通道的实现
  */
 public class SecureNioChannel extends NioChannel  {
 

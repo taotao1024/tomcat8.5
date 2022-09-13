@@ -41,4 +41,12 @@
   <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
   <user username="role1" password="<must-be-changed>" roles="role1"/>
 -->
+  <!--新增管理员用户-->
+  <role rolename="admin-gui"/>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-jmx"/>
+  <role rolename="manager-script"/>
+  <role rolename="manager-status"/>
+  <user username="admin" password="123456" roles="admin-gui,manager-gui,manager-jmx,manager-script,manager-status"/>
+
 </tomcat-users>

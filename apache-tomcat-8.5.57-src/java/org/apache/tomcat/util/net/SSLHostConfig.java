@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.management.ObjectName;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
@@ -147,6 +149,21 @@ public class SSLHostConfig implements Serializable {
         this.openSslContext = openSslContext;
     }
 
+    //*********************************************************************
+    //***************************GMSSL 修改开始******************************
+    //*********************************************************************
+    public void setKeyManager(KeyManager[] keyManager) {
+        registerDefaultCertificate();
+        defaultCertificate.setKeyManager(keyManager);
+    }
+
+    public void setTrustManager(TrustManager[] trustManager) {
+        registerDefaultCertificate();
+        defaultCertificate.setTrustManager(trustManager);
+    }
+    //*********************************************************************
+    //***************************GMSSL 修改结束******************************
+    //*********************************************************************
 
     // Expose in String form for JMX
     public String getConfigType() {

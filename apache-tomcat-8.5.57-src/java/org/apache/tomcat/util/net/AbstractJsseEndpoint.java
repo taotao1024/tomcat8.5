@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.NetworkChannel;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.net.jsse.JSSESSLContext;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
@@ -95,7 +97,15 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
             SSLContext sslContext;
             try {
+                //*********************************************************************
+                //***************************GMSSL 修改开始******************************
+                //*********************************************************************
                 sslContext = sslUtil.createSSLContext(negotiableProtocols);
+//                sslContext = new JSSESSLContext("GMVPNv1.1", KlGMJsseProvider.PROVIDER_NAME);
+//                sslContext.init(certificate.getKeyManager(), certificate.getTrustManager(), new SecureRandom());
+                //*********************************************************************
+                //***************************GMSSL 修改结束******************************
+                //*********************************************************************
             } catch (Exception e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
@@ -119,15 +129,18 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
         SSLEngine engine = sslContext.createSSLEngine();
         engine.setUseClientMode(false);
+        /* 删除对算法套件和协议的设置 */
         engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
-
+        /* */
         SSLParameters sslParameters = engine.getSSLParameters();
         String honorCipherOrderStr = sslHostConfig.getHonorCipherOrder();
+        /* 删除对算法套件和协议的设置 */
         if (honorCipherOrderStr != null) {
             boolean honorCipherOrder = Boolean.parseBoolean(honorCipherOrderStr);
             JreCompat.getInstance().setUseServerCipherSuitesOrder(sslParameters, honorCipherOrder);
         }
+        /* */
 
         if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0

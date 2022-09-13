@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.tomcat.util.net.SSLContext;
 
-class JSSESSLContext implements SSLContext {
+public class JSSESSLContext implements SSLContext {
 
     private javax.net.ssl.SSLContext context;
     private KeyManager[] kms;
@@ -45,6 +46,16 @@ class JSSESSLContext implements SSLContext {
     JSSESSLContext(String protocol) throws NoSuchAlgorithmException {
         context = javax.net.ssl.SSLContext.getInstance(protocol);
     }
+
+    //*********************************************************************
+    //***************************GMSSL 修改开始******************************
+    //*********************************************************************
+    public JSSESSLContext(String protocol, String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
+        context = javax.net.ssl.SSLContext.getInstance(protocol, provider);
+    }
+    //*********************************************************************
+    //***************************GMSSL 修改结束******************************
+    //*********************************************************************
 
     @Override
     public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
